@@ -4,65 +4,133 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0277BD">
+<meta name="theme-color" content="#B8826A">
 <title>2026 釜山九州旅行</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:#EEF6FC;color:#1A2E3B;-webkit-font-smoothing:antialiased}
-input,textarea,select,button{font-family:inherit}
+html,body{height:100%;background:#F5F0E8;color:#2C2420;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+/* ── Font stack: Noto Sans TC 繁中 + Playfair headers ── */
+body,input,textarea,select,button{
+  font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Heiti TC',sans-serif;
+}
 ::-webkit-scrollbar{width:0;height:0}
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-.header{flex-shrink:0;background:linear-gradient(135deg,#01579B,#0288D1,#00ACC1);color:#fff;padding:12px 16px 10px;position:relative}
-.header h1{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;line-height:1.3}
-.header .sub{font-size:11px;opacity:.75;margin-top:2px}
-.header .cntdown{position:absolute;right:16px;top:12px;text-align:right}
-.header .num{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;line-height:1}
-.header .lbl{font-size:10px;opacity:.7}
-.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;background:#F5F0E8}
+
+/* Header — warm terracotta gradient */
+.header{flex-shrink:0;
+  background:linear-gradient(135deg,#B8826A 0%,#C8957A 50%,#BFA082 100%);
+  color:#fff;padding:13px 16px 11px;position:relative}
+.header h1{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;line-height:1.3;letter-spacing:.01em;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.header .sub{font-size:12px;opacity:.75;margin-top:2px;letter-spacing:.04em}
+.header .cntdown{position:absolute;right:16px;top:13px;text-align:right}
+.header .num{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;line-height:1;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.header .lbl{font-size:11px;opacity:.65;letter-spacing:.04em}
+
+/* Main */
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#F5F0E8}
 .main.map-active{overflow:hidden}
-.nav{flex-shrink:0;display:flex;background:#fff;border-top:1px solid #E1EEF6;padding-bottom:env(safe-area-inset-bottom)}
-.nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;border:none;background:none;cursor:pointer;color:#90A4AE;font-size:10px;font-family:'DM Sans',sans-serif;min-height:52px}
-.nav button.act{color:#0277BD;font-weight:600}
-.nav button .ic{font-size:22px;line-height:1}
-.card{background:#fff;border-radius:14px;border:1px solid #E1EEF6;overflow:hidden;margin-bottom:10px}
+
+/* Nav — warm parchment */
+.nav{flex-shrink:0;display:flex;background:#F5F0E8;border-top:1px solid #E0D8CC;
+  padding-bottom:env(safe-area-inset-bottom)}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 4px;border:none;background:none;cursor:pointer;color:#C0A898;
+  font-size:11px;font-family:'Noto Sans TC',sans-serif;min-height:54px;letter-spacing:.02em}
+.nav button.act{color:#B8826A;font-weight:600}
+.nav button .ic{font-size:23px;line-height:1}
+
+/* Cards */
+.card{background:#fff;border-radius:14px;border:1px solid #E8E2D6;overflow:hidden;
+  margin-bottom:10px;box-shadow:0 2px 8px rgba(44,36,32,.07)}
 .card-top{height:3px}
-.card-body{padding:12px 14px}
-.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
-.btn-p{background:#0277BD;color:#fff;border:none;border-radius:22px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;display:inline-flex;align-items:center;gap:5px}
-.btn-g{background:none;border:1.5px solid #D1EAF5;border-radius:22px;padding:9px 16px;font-size:14px;color:#0277BD;cursor:pointer;font-family:inherit;min-height:44px}
-.inp{border:1.5px solid #D1EAF5;border-radius:10px;padding:10px 13px;font-size:16px;font-family:inherit;background:#F8FFFE;width:100%;outline:none;color:#1A2E3B;-webkit-appearance:none}
-.inp:focus{border-color:#0288D1;outline:none}
-.tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
-.section{padding:14px 16px}
-.dayrow{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
-.daypill{flex-shrink:0;min-width:56px;padding:7px 6px;border-radius:12px;border:2px solid transparent;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;border-width:2px}
-.spot{background:#fff;border-radius:12px;border:1px solid #E1EEF6;padding:12px 13px;margin-bottom:8px}
-.spot-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
-.mpill{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:4px;min-height:36px}
-.chat-wrap{display:flex;flex-direction:column;height:calc(100dvh - 130px)}
-.chat-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.bubble{padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5;max-width:85%;word-break:break-word}
-.bubble.u{background:#0277BD;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
-.bubble.a{background:#fff;border:1px solid #E1EEF6;color:#1A2E3B;border-bottom-left-radius:4px;align-self:flex-start}
-.typing{display:flex;gap:4px;padding:12px 14px;background:#fff;border-radius:14px;border:1px solid #E1EEF6;align-self:flex-start}
-.typing span{width:7px;height:7px;background:#90A4AE;border-radius:50%;animation:bounce .9s infinite}
+.card-body{padding:13px 15px}
+
+/* Pill badge */
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;
+  padding:3px 10px;border-radius:20px;letter-spacing:.02em}
+
+/* Primary button */
+.btn-p{background:#B8826A;color:#fff;border:none;border-radius:22px;padding:11px 22px;
+  font-size:15px;font-weight:600;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;min-height:46px;
+  display:inline-flex;align-items:center;gap:5px;letter-spacing:.02em;
+  box-shadow:0 2px 8px rgba(184,130,106,.3)}
+/* Ghost button */
+.btn-g{background:none;border:1.5px solid #E0D8CC;border-radius:22px;padding:10px 18px;
+  font-size:15px;color:#7A6A5A;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;min-height:46px}
+
+/* Input */
+.inp{border:1.5px solid #E0D8CC;border-radius:10px;padding:11px 14px;font-size:16px;
+  font-family:'Noto Sans TC',sans-serif;background:#FAF7F2;width:100%;
+  outline:none;color:#2C2420;-webkit-appearance:none}
+.inp:focus{border-color:#C8957A;outline:none}
+
+/* Tag */
+.tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:12px;display:inline-block}
+.section{padding:15px 16px}
+
+/* Itinerary day pills */
+.dayrow{display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:5px;scrollbar-width:none}
+.daypill{flex-shrink:0;min-width:60px;padding:7px 6px;border-radius:12px;
+  border:2px solid transparent;background:#fff;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  min-height:56px;box-shadow:0 1px 5px rgba(44,36,32,.08)}
+
+/* Spot card */
+.spot{background:#fff;border-radius:12px;border:1px solid #E8E2D6;padding:13px 14px;
+  margin-bottom:9px;box-shadow:0 1px 6px rgba(44,36,32,.06)}
+.spot-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+
+/* Map links */
+.mpill{padding:6px 13px;border-radius:20px;font-size:13px;font-weight:600;color:#fff;
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;min-height:38px}
+
+/* Chat */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100dvh - 135px)}
+.chat-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 15px;display:flex;flex-direction:column;gap:10px}
+.bubble{padding:11px 15px;border-radius:14px;font-size:15px;line-height:1.6;
+  max-width:85%;word-break:break-word}
+.bubble.u{background:#B8826A;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.bubble.a{background:#fff;border:1px solid #E8E2D6;color:#2C2420;
+  border-bottom-left-radius:4px;align-self:flex-start}
+.typing{display:flex;gap:4px;padding:12px 14px;background:#fff;border-radius:14px;
+  border:1px solid #E8E2D6;align-self:flex-start}
+.typing span{width:7px;height:7px;background:#C0A898;border-radius:50%;animation:bounce .9s infinite}
 .typing span:nth-child(2){animation-delay:.2s}
 .typing span:nth-child(3){animation-delay:.4s}
-@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-.modal-bg{position:fixed;inset:0;background:rgba(1,87,155,.3);display:flex;align-items:flex-end;justify-content:center;z-index:999;backdrop-filter:blur(2px)}
-.sync{position:fixed;top:0;left:50%;transform:translateX(-50%);background:#01579B;color:#fff;font-size:12px;padding:6px 16px;border-radius:0 0 10px 10px;z-index:9999;transition:opacity .3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(60,40,30,.35);display:flex;
+  align-items:flex-end;justify-content:center;z-index:999;backdrop-filter:blur(3px)}
+.modal{background:#FAF7F2;border-radius:20px 20px 0 0;padding:22px 16px;width:100%;
+  padding-bottom:calc(22px + env(safe-area-inset-bottom));max-height:88vh;
+  overflow-y:auto;border-top:1px solid #E8E2D6}
+
+/* Sync bar */
+.sync{position:fixed;top:0;left:50%;transform:translateX(-50%);background:#B8826A;
+  color:#fff;font-size:13px;padding:7px 18px;border-radius:0 0 12px 12px;
+  z-index:9999;transition:opacity .3s}
 .sync.hide{opacity:0;pointer-events:none}
-.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;padding-bottom:calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto}
+
+/* Section label 小標 */
+.sec-label{font-size:12px;font-weight:700;color:#C0A898;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:9px;margin-top:20px}
 </style>
 </head>
 <body>
+
 <div class="app">
   <div class="header">
     <div class="cntdown"><div class="num" id="dLeft">…</div><div class="lbl" id="dLbl"></div></div>
-    <h1>🇰🇷 釜山九州 2026 🇯🇵</h1>
-    <div class="sub" id="subTitle">熊本慢活版 · 9人自駕 · 6/26–7/5</div>
+    <h1>🇰🇷 釜山九州 2026 🇯🇵 <span id="syncDot" title="同步狀態" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;vertical-align:middle;margin-left:4px;cursor:pointer" onclick="loadAll()"></span></h1>
+    <div class="sub" id="subTitle">熊本慢活版 · 9人自駕 · 6/26–7/5</div><div style="font-size:12px;opacity:.35;letter-spacing:.15em;margin-top:3px">✈ ⛩ 🌋 🛶 🌸 🏯</div>
   </div>
   <div class="main" id="mainEl"></div>
   <nav class="nav">
@@ -70,7 +138,7 @@ input,textarea,select,button{font-family:inherit}
     <button data-t="itin" onclick="go('itin')"><span class="ic">📅</span>行程</button>
     <button data-t="accom" onclick="go('accom')"><span class="ic">🏨</span>住宿</button>
     <button data-t="expense" onclick="go('expense')"><span class="ic">🧾</span>記帳</button>
-    <button data-t="ai" onclick="go('ai')"><span class="ic">🤖</span>助手</button>
+    <button data-t="ai" onclick="go('ai')"><span class="ic">🔗</span>工具</button>
     <button data-t="more" onclick="go('more')"><span class="ic">⋯</span>更多</button>
   </nav>
 </div>
@@ -80,11 +148,11 @@ input,textarea,select,button{font-family:inherit}
 // ╔══════════════════════════════════════════════════╗
 // ║  🔧 填入你的 Google Apps Script 部署 URL        ║
 // ╚══════════════════════════════════════════════════╝
-const DEPLOY_API_URL = 'https://script.google.com/macros/s/AKfycbwCQ0YRySXdOWwDiH8Dqu_ibGy4mnS2T9xAMvYNErxwBu_18wn9hUNvj7qPKZQQgZ9a/exec';   // ← 貼在引號內
+const DEPLOY_API_URL = 'https://script.google.com/macros/s/AKfycbxEPCoNkVqDUQuYuYDfxGXM7kGkQ-v1hh0NGFWMs4UG0QlM2UA2YR9dR_76VtrYd_We/exec';
 const DEPLOY_ALBUM_URL = 'https://photos.app.goo.gl/w1aDwmtASJP9siVg7';
 
 // ═══ COLOURS ═══
-const DC={1:"#C62828",2:"#BF360C",3:"#6A1B9A",4:"#1565C0",5:"#2E7D32",6:"#00695C",7:"#880E4F",8:"#006064",9:"#4527A0",10:"#01579B"};
+const DC={1:"#C5927A",2:"#B8956A",3:"#8A7AB0",4:"#7A9E8A",5:"#B8A070",6:"#6A9EA8",7:"#A07A8A",8:"#6A8AA0",9:"#8A7AB0",10:"#B8956A"};
 const DEM=["🇰🇷","🦀","⛴","🦌","🦁","🌋","🛶","🛍","🎨","✈️"];
 const DT=["抵達釜山/宵夜","海線滿貫/遊艇","醫美/南浦洞/登船","博多取車/由布院","動物園/黒川溫泉","阿蘇絕景/高千穗","晨間划船/熊本城","鳥栖血拼/福岡賞花","近郊採買/光影藝術","市區巡禮/滿載返台"];
 const DM2={1:"6/26五",2:"6/27六",3:"6/28日",4:"6/29一",5:"6/30二",6:"7/1三",7:"7/2四",8:"7/3五",9:"7/4六",10:"7/5日"};
@@ -200,7 +268,7 @@ const SPOTS={
   {t:"F",hk:"h_lamp",nm:"🏠 [LAMP] 退房",lat:33.5904,lng:130.4017},
   {t:"s",nm:"🛍 天神商圈 / 地下街（最後採購）",lat:33.5908,lng:130.3989,gmap:g("天神地下街福岡"),hours:"10:00–20:00"},
   {t:"s",nm:"🍰 Qu'il fait bon 水果塔",lat:33.591,lng:130.398,gmap:g("Quilfaitbon天神福岡"),price:"¥1,200–2,500"},
-  {t:"s",nm:"💊 猛健樂 診所",lat:33.5908,lng:130.3985,gmap:g("猛健樂福岡天神")},
+  {t:"s",nm:"💊 Yoroshii 福岡診所（醫美）",lat:33.5904,lng:130.4015,gmap:g("Yoroshii福岡天神"),naver:n("요로시이 후쿠오카 클리닉")},
   {t:"T",nm:"✈️ FunFun還車→福岡機場 返台",lat:33.5859,lng:130.4435,gmap:g("福岡空港国際線"),note:"⚠️18:00還車！21:00 CI-0117"},
 ],
 };
@@ -293,7 +361,7 @@ async function loadAll(){
   render();
   // Then load from API
   if(ST.apiUrl){
-    showSync("⏳ 同步中…");
+    const dot2=document.getElementById("syncDot");if(dot2)dot2.style.background="#B8A890";
     const r=await apiGet();
     if(r&&r.ok&&r.data){
       const d=r.data;
@@ -305,8 +373,12 @@ async function loadAll(){
         if(d.config.rates)try{ST.rates=JSON.parse(d.config.rates);}catch{}
       }
       if(d.budget&&d.budget.length){ST.budgetItems=d.budget;ls("t26_bgt",d.budget);}
-      showSync("✓ 已同步");render();
-    } else showSync("⚠️ 同步失敗，使用本地資料");
+      const dot3=document.getElementById("syncDot");if(dot3){dot3.style.background="#4CAF50";dot3.title="已同步";}render();
+    } else {
+      // 靜默降級：不跳警告，只更新 header 小點
+      const dot=document.getElementById("syncDot");
+      if(dot){dot.title="同步失敗，使用本地資料";dot.style.background="#FFA726";}
+    }
   }
 }
 
@@ -368,20 +440,20 @@ function buildMap(day){
         L.polyline([[v[i].lat,v[i].lng],[v[i+1].lat,v[i+1].lng]],{color:col,weight:3.5,dashArray:"7,4",opacity:.85}).addTo(map);
         const ang=Math.atan2(v[i+1].lng-v[i].lng,v[i+1].lat-v[i].lat)*(180/Math.PI);
         const ml=[(v[i].lat+v[i+1].lat)/2,(v[i].lng+v[i+1].lng)/2];
-        L.marker(ml,{icon:L.divIcon({className:"",html:`<span style="transform:rotate(${-ang+90}deg);display:block;font-size:13px;color:${col};text-shadow:0 0 3px #fff;line-height:1">▶</span>`,iconSize:[13,13],iconAnchor:[6,6]}),interactive:false}).addTo(map);
+        L.marker(ml,{icon:L.divIcon({className:"",html:`<span style="transform:rotate(${-ang+90}deg);display:block;font-size:16px;color:${col};text-shadow:0 0 3px #fff;line-height:1">▶</span>`,iconSize:[13,13],iconAnchor:[6,6]}),interactive:false}).addTo(map);
       }
     }
-    if(isAll){for(let d=1;d<=10;d++)route(AS.filter(s=>s.day===d&&s.lat&&s.lng),DC[d]||"#0277BD");}
-    else route(pts,DC[Number(day)]||"#0277BD");
+    if(isAll){for(let d=1;d<=10;d++)route(AS.filter(s=>s.day===d&&s.lat&&s.lng),DC[d]||"#B8826A");}
+    else route(pts,DC[Number(day)]||"#B8826A");
     let sn2=0;
     pts.forEach(sp=>{
-      const c=DC[sp.day]||"#0277BD",isH=["T","F","FT"].includes(sp.t);
+      const c=DC[sp.day]||"#B8826A",isH=["T","F","FT"].includes(sp.t);
       if(!isH)sn2++;
       const lbl=isH?({F:"F",T:"T",FT:"F/T"}[sp.t]||"H"):(isAll?`D${sp.day}`:String(sn2));
       const sz=isH?28:24;
       const ic=L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${isH?c+"99":c};border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${isH?9:10}px;font-weight:700;color:#fff;box-shadow:0 1px 6px rgba(0,0,0,.25)">${lbl}</div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],popupAnchor:[0,-sz/2]});
       const burl=sp.hk?BOOKING[sp.hk]:"";
-      L.marker([sp.lat,sp.lng],{icon:ic}).addTo(map).bindPopup(`<div style="font-size:13px;font-family:'DM Sans',sans-serif;min-width:170px"><div style="font-size:10px;color:${c};font-weight:700;margin-bottom:2px">Day${sp.day} ${DM2[sp.day]||""} · ${DT[(sp.day||1)-1]}</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">${sp.nm}</div>${sp.hours?`<div>🕐 ${sp.hours}</div>`:""}${sp.price?`<div style="color:#0277BD;font-weight:600">💰 ${sp.price}</div>`:""}${sp.note?`<div style="color:#546E7A;font-size:11px;margin-top:2px">${sp.note}</div>`:""}<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${sp.gmap?`<a href="${sp.gmap}" target="_blank" style="background:#4285F4;color:#fff;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none">Google</a>`:""}${sp.naver?`<a href="${sp.naver}" target="_blank" style="background:#03C75A;color:#fff;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none">Naver</a>`:""}${burl?`<a href="${burl}" target="_blank" style="background:${c};color:#fff;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none">訂單</a>`:""}</div></div>`,{maxWidth:280});
+      L.marker([sp.lat,sp.lng],{icon:ic}).addTo(map).bindPopup(`<div style="font-size:16px;font-family:'DM Sans',sans-serif;min-width:170px"><div style="font-size:10px;color:${c};font-weight:700;margin-bottom:2px">Day${sp.day} ${DM2[sp.day]||""} · ${DT[(sp.day||1)-1]}</div><div style="font-weight:600;font-size:16px;margin-bottom:4px">${sp.nm}</div>${sp.hours?`<div>🕐 ${sp.hours}</div>`:""}${sp.price?`<div style="color:#B8826A;font-weight:600">💰 ${sp.price}</div>`:""}${sp.note?`<div style="color:#7A6A5A;font-size:16px;margin-top:2px">${sp.note}</div>`:""}<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${sp.gmap?`<a href="${sp.gmap}" target="_blank" style="background:#4285F4;color:#fff;padding:4px 10px;border-radius:16px;font-size:16px;font-weight:600;text-decoration:none">Google</a>`:""}${sp.naver?`<a href="${sp.naver}" target="_blank" style="background:#03C75A;color:#fff;padding:4px 10px;border-radius:16px;font-size:16px;font-weight:600;text-decoration:none">Naver</a>`:""}${burl?`<a href="${burl}" target="_blank" style="background:${c};color:#fff;padding:4px 10px;border-radius:16px;font-size:16px;font-weight:600;text-decoration:none">訂單</a>`:""}</div></div>`,{maxWidth:280});
     });
     const bounds=pts.map(s=>[s.lat,s.lng]);
     if(bounds.length)map.fitBounds(bounds,{padding:[44,44],maxZoom:isAll?5:12});
@@ -412,9 +484,9 @@ function changeMapDay(dd){
 }
 function buildPills(active){
   return ["all",1,2,3,4,5,6,7,8,9,10].map(dd=>{
-    const act=active===dd,c=dd==="all"?"#01579B":(DC[dd]||"#0277BD");
-    const lbl=dd==="all"?`🗺️<br><span style="font-size:9px">全程</span>`:`${DEM[dd-1]||""}<br><span style="font-size:11px;font-weight:700">D${dd}</span><br><span style="font-size:9px">${DM2[dd]||""}</span>`;
-    return`<button onclick="changeMapDay(${JSON.stringify(dd)})" style="flex-shrink:0;min-width:${dd==="all"?58:50}px;padding:5px 7px;border-radius:10px;border:2px solid ${act?c:"#D1EAF5"};background:${act?c:"#fff"};color:${act?"#fff":c};font-size:12px;cursor:pointer;font-family:inherit;min-height:50px;line-height:1.3;display:flex;flex-direction:column;align-items:center;justify-content:center">${lbl}</button>`;
+    const act=active===dd,c=dd==="all"?"#2C2420":(DC[dd]||"#B8826A");
+    const lbl=dd==="all"?`🗺️<br><span style="font-size:9px">全程</span>`:`${DEM[dd-1]||""}<br><span style="font-size:16px;font-weight:700">D${dd}</span><br><span style="font-size:9px">${DM2[dd]||""}</span>`;
+    return`<button onclick="changeMapDay(${JSON.stringify(dd)})" style="flex-shrink:0;min-width:${dd==="all"?58:50}px;padding:5px 7px;border-radius:10px;border:2px solid ${act?c:"#E0D8CC"};background:${act?c:"#fff"};color:${act?"#fff":c};font-size:16px;cursor:pointer;font-family:inherit;min-height:50px;line-height:1.3;display:flex;flex-direction:column;align-items:center;justify-content:center">${lbl}</button>`;
   }).join("");
 }
 function rMap(el){
@@ -423,7 +495,7 @@ function rMap(el){
   if(mapInst){try{mapInst.off();mapInst.remove();}catch(e){}mapInst=null;}
   el.innerHTML=
     '<div style="display:flex;flex-direction:column;height:100%;overflow:hidden">'+
-      '<div id="mapPills" style="flex-shrink:0;background:#fff;border-bottom:1px solid #E1EEF6;padding:9px 13px 7px;display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">'+buildPills(d)+'</div>'+
+      '<div id="mapPills" style="flex-shrink:0;background:#fff;border-bottom:1px solid #E8E2D6;padding:9px 13px 7px;display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">'+buildPills(d)+'</div>'+
       '<div id="mapEl" style="flex:1;min-height:200px;background:#E8F4F8"></div>'+
     '</div>';
   // Double rAF ensures layout is complete before Leaflet reads dimensions
@@ -432,14 +504,14 @@ function rMap(el){
 
 // ─── ITIN ───
 function rItin(el){
-  const dd=ST.itinDay,col=DC[dd]||"#0277BD";
+  const dd=ST.itinDay,col=DC[dd]||"#B8826A";
   const dspots=SPOTS[dd]||[],xtra=ST.extra[dd]||[],meal=MEALS[dd-1];
   const pills=Array.from({length:10},(_,i)=>i+1).map(dn=>{
-    const act=dn===dd,c=DC[dn]||"#0277BD";
-    return`<div onclick="ST.itinDay=${dn};render()" class="daypill" style="border-color:${act?c:"#D1EAF5"};background:${act?c:"#fff"};color:${act?"#fff":c}"><span style="font-size:15px">${DEM[dn-1]||""}</span><span style="font-size:11px;font-weight:700">D${dn}</span><span style="font-size:9px;opacity:.85">${DM2[dn]||""}</span></div>`;
+    const act=dn===dd,c=DC[dn]||"#B8826A";
+    return`<div onclick="ST.itinDay=${dn};render()" class="daypill" style="border-color:${act?c:"#E0D8CC"};background:${act?c:"#fff"};color:${act?"#fff":c}"><span style="font-size:16px">${DEM[dn-1]||""}</span><span style="font-size:16px;font-weight:700">D${dn}</span><span style="font-size:9px;opacity:.85">${DM2[dn]||""}</span></div>`;
   }).join("");
-  const mCard=meal?`<div style="background:${col};border-radius:14px;padding:12px 15px;margin-bottom:12px;color:#fff"><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:8px">${DEM[dd-1]} D${dd} ${DM2[dd]} · ${DT[dd-1]}</div><div style="display:flex;flex-wrap:wrap;gap:7px">${[["☀️早",meal.m],["🌞午",meal.l],["🌙晚",meal.dn],["🍰點",meal.s]].filter(([,v])=>v).map(([l,v])=>`<div style="background:rgba(255,255,255,.2);border-radius:9px;padding:6px 10px"><div style="font-size:10px;font-weight:700;opacity:.9">${l}</div><div style="font-size:12px;margin-top:1px">${v}</div></div>`).join("")}</div></div>`:"";
-    const routeBtn='<button onclick="go(\'map\');ST.mapDay='+dd+';render();setTimeout(()=>changeMapDay('+dd+'),150)"'+'style="display:flex;align-items:center;gap:6px;background:#EEF6FC;border:1px solid #D1EAF5;'+'border-radius:10px;padding:9px 14px;cursor:pointer;font-family:inherit;font-size:13px;'+'color:#0277BD;font-weight:600;width:100%;justify-content:center;margin-bottom:12px;min-height:44px">'+'🗺️ 查看 D'+dd+' 路線地圖 →</button>';
+  const mCard=meal?`<div style="background:${col};border-radius:14px;padding:12px 15px;margin-bottom:12px;color:#fff"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:8px">${DEM[dd-1]} D${dd} ${DM2[dd]} · ${DT[dd-1]}</div><div style="display:flex;flex-wrap:wrap;gap:7px">${[["☀️早",meal.m],["🌞午",meal.l],["🌙晚",meal.dn],["🍰點",meal.s]].filter(([,v])=>v).map(([l,v])=>`<div style="background:rgba(255,255,255,.2);border-radius:9px;padding:6px 10px"><div style="font-size:10px;font-weight:700;opacity:.9">${l}</div><div style="font-size:16px;margin-top:1px">${v}</div></div>`).join("")}</div></div>`:"";
+    const routeBtn='<button onclick="go(\'map\');ST.mapDay='+dd+';render();setTimeout(()=>changeMapDay('+dd+'),150)"'+'style="display:flex;align-items:center;gap:6px;background:#F5F0E8;border:1px solid #E0D8CC;'+'border-radius:10px;padding:9px 14px;cursor:pointer;font-family:inherit;font-size:16px;'+'color:#B8826A;font-weight:600;width:100%;justify-content:center;margin-bottom:12px;min-height:44px">'+'🗺️ 查看 D'+dd+' 路線地圖 →</button>';
   const items=[...dspots.map((s,i)=>({...s,_k:`${dd}_${i}`,_i:i,_ex:false})),...xtra.map((s,i)=>({...s,_k:`${dd}_x${i}`,_i:i,_ex:true}))];
   const spotsH=items.map((sp,vi)=>{
     const k=sp._k,isDone=!!ST.done[k],note=ST.notes[k]||"";
@@ -448,26 +520,26 @@ function rItin(el){
     const hotel=sp.hk?HOTELS[sp.hk]:null;
     const burl=sp.hk?BOOKING[sp.hk]:"";
     const chk=isDone?
-      `<div onclick="toggleDone('${k}')" style="width:24px;height:24px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#fff;font-size:14px">✓</div>`:
-      `<div onclick="toggleDone('${k}')" style="width:24px;height:24px;border-radius:50%;border:2px solid #D1EAF5;background:#fff;cursor:pointer;flex-shrink:0"></div>`;
+      `<div onclick="toggleDone('${k}')" style="width:24px;height:24px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#fff;font-size:16px">✓</div>`:
+      `<div onclick="toggleDone('${k}')" style="width:24px;height:24px;border-radius:50%;border:2px solid #E0D8CC;background:#fff;cursor:pointer;flex-shrink:0"></div>`;
     return`<div class="spot" style="${isH?`border-left:3px solid ${col};`:""}opacity:${isDone?.6:1}">
       <div style="display:flex;gap:10px;align-items:flex-start">
         <div class="spot-circle" style="background:${isH?col+"55":col};color:${isH?col:"#fff"};${isH?`border:1.5px solid ${col};width:34px;height:34px`:""}">${lbl}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
-            <div style="font-weight:600;font-size:14px;color:${isDone?"#90A4AE":"#1A2E3B"};text-decoration:${isDone?"line-through":"none"};line-height:1.35;word-break:break-word">${sp.nm}</div>
-            <div style="display:flex;gap:4px;flex-shrink:0">${sp._ex?`<button onclick="delXtra(${dd},${sp._i})" style="background:none;border:none;cursor:pointer;color:#C62828;font-size:15px;min-width:26px;min-height:26px">🗑</button>`:""}${chk}</div>
+            <div style="font-weight:600;font-size:16px;color:${isDone?"#B8A890":"#2C2420"};text-decoration:${isDone?"line-through":"none"};line-height:1.35;word-break:break-word">${sp.nm}</div>
+            <div style="display:flex;gap:4px;flex-shrink:0">${sp._ex?`<button onclick="delXtra(${dd},${sp._i})" style="background:none;border:none;cursor:pointer;color:#C05A40;font-size:16px;min-width:26px;min-height:26px">🗑</button>`:""}${chk}</div>
           </div>
-          ${(sp.hours||sp.price)?`<div style="font-size:12px;color:#546E7A;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap">${sp.hours?`<span>🕐 ${sp.hours}</span>`:""}${sp.price?`<span style="color:#0277BD;font-weight:600">💰 ${sp.price}</span>`:""}</div>`:""}
-          ${sp.note?`<div style="font-size:12px;color:#546E7A;margin-top:3px;line-height:1.4">${sp.note}</div>`:""}
-          ${sp.mc?`<div style="font-size:11px;color:#90A4AE;margin-top:2px;font-family:monospace">📍 ${sp.mc}</div>`:""}
-          ${hotel&&isH?`<div style="margin-top:7px;background:#F0F9FF;border-radius:9px;padding:8px 10px;font-size:12px">${hotel.day?`<div style="font-weight:600;color:${col};margin-bottom:2px">${hotel.day}</div>`:""} ${hotel.addr?`<div style="color:#546E7A">📍 ${hotel.addr}</div>`:""} ${hotel.phone?`<div>📞 <a href="tel:${hotel.phone}" style="color:#0277BD;font-weight:600">${hotel.phone}</a></div>`:""} ${hotel.ref?`<div style="font-family:monospace;color:#0277BD;font-size:11px">${hotel.ref}</div>`:""} <div style="color:#BF360C;font-weight:600">💳 ${hotel.cost}</div> ${hotel.note?`<div style="color:#546E7A;font-style:italic;margin-top:2px;font-size:11px">${hotel.note}</div>`:""}</div>`:""}
+          ${(sp.hours||sp.price)?`<div style="font-size:16px;color:#7A6A5A;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap">${sp.hours?`<span>🕐 ${sp.hours}</span>`:""}${sp.price?`<span style="color:#B8826A;font-weight:600">💰 ${sp.price}</span>`:""}</div>`:""}
+          ${sp.note?`<div style="font-size:16px;color:#7A6A5A;margin-top:3px;line-height:1.4">${sp.note}</div>`:""}
+          ${sp.mc?`<div style="font-size:16px;color:#B8A890;margin-top:2px;font-family:monospace">📍 ${sp.mc}</div>`:""}
+          ${hotel&&isH?`<div style="margin-top:7px;background:#FAF6EE;border-radius:9px;padding:8px 10px;font-size:16px">${hotel.day?`<div style="font-weight:600;color:${col};margin-bottom:2px">${hotel.day}</div>`:""} ${hotel.addr?`<div style="color:#7A6A5A">📍 ${hotel.addr}</div>`:""} ${hotel.phone?`<div>📞 <a href="tel:${hotel.phone}" style="color:#B8826A;font-weight:600">${hotel.phone}</a></div>`:""} ${hotel.ref?`<div style="font-family:monospace;color:#B8826A;font-size:16px">${hotel.ref}</div>`:""} <div style="color:#B8956A;font-weight:600">💳 ${hotel.cost}</div> ${hotel.note?`<div style="color:#7A6A5A;font-style:italic;margin-top:2px;font-size:16px">${hotel.note}</div>`:""}</div>`:""}
           <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">
             ${sp.naver?`<a href="${sp.naver}" target="_blank" class="mpill" style="background:#03C75A">Naver</a>`:""}
             ${sp.gmap?`<a href="${sp.gmap}" target="_blank" class="mpill" style="background:#4285F4">Google</a>`:""}
             ${burl?`<a href="${burl}" target="_blank" class="mpill" style="background:${col}">📋 訂單</a>`:""}
           </div>
-          ${note?`<div style="margin-top:5px;font-size:12px;color:#0277BD;background:#EEF6FC;border-radius:8px;padding:5px 9px">📝 ${note}</div>`:""}
+          ${note?`<div style="margin-top:5px;font-size:16px;color:#B8826A;background:#F5F0E8;border-radius:8px;padding:5px 9px">📝 ${note}</div>`:""}
         </div>
       </div>
     </div>`;
@@ -481,7 +553,7 @@ function toggleDone(k){
 function delXtra(day,idx){const x={...ST.extra};const a=[...(x[day]||[])];a.splice(idx,1);x[day]=a;set("extra",x);}
 function openAddSpot(d){sn("addSpotDay",d);}
 function addSpotModal(day){
-  return`<div class="modal-bg" onclick="if(event.target===this)sn('addSpotDay',null)"><div class="modal"><div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:${DC[day]||"#0277BD"};margin-bottom:12px">D${day} 新增景點</div><div style="display:flex;flex-direction:column;gap:9px"><input class="inp" id="ns_nm" placeholder="景點/餐廳名稱 *"><input class="inp" id="ns_gm" placeholder="Google Maps 連結"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px"><input class="inp" id="ns_hr" placeholder="營業時間"><input class="inp" id="ns_pr" placeholder="票價"></div><input class="inp" id="ns_nt" placeholder="備注"><div style="display:flex;gap:9px"><button class="btn-p" style="flex:1" onclick="saveNewSpot()">新增 ✓</button><button class="btn-g" onclick="sn('addSpotDay',null)">取消</button></div></div></div></div>`;
+  return`<div class="modal-bg" onclick="if(event.target===this)sn('addSpotDay',null)"><div class="modal"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:${DC[day]||"#B8826A"};margin-bottom:12px">D${day} 新增景點</div><div style="display:flex;flex-direction:column;gap:9px"><input class="inp" id="ns_nm" placeholder="景點/餐廳名稱 *"><input class="inp" id="ns_gm" placeholder="Google Maps 連結"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px"><input class="inp" id="ns_hr" placeholder="營業時間"><input class="inp" id="ns_pr" placeholder="票價"></div><input class="inp" id="ns_nt" placeholder="備注"><div style="display:flex;gap:9px"><button class="btn-p" style="flex:1" onclick="saveNewSpot()">新增 ✓</button><button class="btn-g" onclick="sn('addSpotDay',null)">取消</button></div></div></div></div>`;
 }
 function saveNewSpot(){
   const nm=document.getElementById("ns_nm")?.value?.trim();if(!nm)return;
@@ -493,14 +565,14 @@ function saveNewSpot(){
 // ─── ACCOM ───
 const HORD=["h_encore","h_ferry","h_grandbase","h_kamenoi","h_yukigumo","h_ref","h_vessel","h_lamp"];
 const HICO={h_encore:"🇰🇷",h_ferry:"⛴️",h_grandbase:"🏠",h_kamenoi:"♨️",h_yukigumo:"🎭",h_ref:"🏯",h_vessel:"🎨",h_lamp:"🎪"};
-const HCOL={h_encore:"#C62828",h_ferry:"#6A1B9A",h_grandbase:"#BF360C",h_kamenoi:"#2E7D32",h_yukigumo:"#1565C0",h_ref:"#880E4F",h_vessel:"#006064",h_lamp:"#4527A0"};
+const HCOL={h_encore:"#C05A40",h_ferry:"#6A1B9A",h_grandbase:"#B8956A",h_kamenoi:"#2E7D32",h_yukigumo:"#1565C0",h_ref:"#880E4F",h_vessel:"#006064",h_lamp:"#4527A0"};
 function rAccom(el){
   const html=HORD.map(hk=>{
     const h=HOTELS[hk];if(!h)return"";
-    const c=HCOL[hk]||"#0277BD",isO=ST.accomOpen[hk],burl=BOOKING[hk]||"";
-    return`<div class="card"><div class="card-top" style="background:${c}"></div><div class="card-body" onclick="ST.accomOpen['${hk}']=!ST.accomOpen['${hk}'];render()" style="cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1;min-width:0"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px"><span>${HICO[hk]||"🏨"}</span><span class="pill" style="background:${c}18;color:${c}">${h.day}</span></div><div style="font-weight:600;font-size:15px;word-break:break-word">${h.zh}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-weight:600;font-size:12px;color:#BF360C">${h.cost.split("（")[0]}</div><div style="color:#90A4AE;margin-top:2px">${isO?"▲":"▼"}</div></div></div></div>${isO?`<div style="padding:0 14px 14px;border-top:1px solid #E1EEF6;max-height:320px;overflow-y:auto"><div style="display:flex;flex-direction:column;gap:5px;margin-top:9px">${h.addr?`<div style="font-size:12px;color:#546E7A">📍 ${h.addr}</div>`:""} ${h.phone?`<div style="font-size:12px">📞 <a href="tel:${h.phone}" style="color:#0277BD;font-weight:600">${h.phone}</a></div>`:""} ${h.ref?`<div style="font-size:12px;font-family:monospace;color:#0277BD">${h.ref}</div>`:""} ${h.ci?`<div style="font-size:12px;color:#546E7A">🕐 CI ${h.ci} / CO ${h.co}</div>`:""} <div style="font-weight:600;font-size:12px;color:#BF360C">💳 ${h.cost}</div> ${h.note?`<div style="background:#F0F9FF;border-radius:9px;padding:8px 10px;font-size:12px;line-height:1.6">${h.note}</div>`:""} ${burl?`<a href="${burl}" target="_blank" class="btn-p" style="text-decoration:none;margin-top:5px;font-size:13px">📋 查看訂單確認頁 ↗</a>`:""}</div></div>`:""}</div>`;
+    const c=HCOL[hk]||"#B8826A",isO=ST.accomOpen[hk],burl=BOOKING[hk]||"";
+    return`<div class="card"><div class="card-top" style="background:${c}"></div><div class="card-body" onclick="ST.accomOpen['${hk}']=!ST.accomOpen['${hk}'];render()" style="cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1;min-width:0"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px"><span>${HICO[hk]||"🏨"}</span><span class="pill" style="background:${c}18;color:${c}">${h.day}</span></div><div style="font-weight:600;font-size:16px;word-break:break-word">${h.zh}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-weight:600;font-size:16px;color:#B8956A">${h.cost.split("（")[0]}</div><div style="color:#B8A890;margin-top:2px">${isO?"▲":"▼"}</div></div></div></div>${isO?`<div style="padding:0 14px 14px;border-top:1px solid #E8E2D6;max-height:320px;overflow-y:auto"><div style="display:flex;flex-direction:column;gap:5px;margin-top:9px">${h.addr?`<div style="font-size:16px;color:#7A6A5A">📍 ${h.addr}</div>`:""} ${h.phone?`<div style="font-size:16px">📞 <a href="tel:${h.phone}" style="color:#B8826A;font-weight:600">${h.phone}</a></div>`:""} ${h.ref?`<div style="font-size:16px;font-family:monospace;color:#B8826A">${h.ref}</div>`:""} ${h.ci?`<div style="font-size:16px;color:#7A6A5A">🕐 CI ${h.ci} / CO ${h.co}</div>`:""} <div style="font-weight:600;font-size:16px;color:#B8956A">💳 ${h.cost}</div> ${h.note?`<div style="background:#FAF6EE;border-radius:9px;padding:8px 10px;font-size:16px;line-height:1.6">${h.note}</div>`:""} ${burl?`<a href="${burl}" target="_blank" class="btn-p" style="text-decoration:none;margin-top:5px;font-size:16px">📋 查看訂單確認頁 ↗</a>`:""}</div></div>`:""}</div>`;
   }).join("");
-  el.innerHTML=`<div class="section"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:3px">🏨 住宿總覽</div><div style="font-size:13px;color:#546E7A;margin-bottom:14px">9晚合計：<strong style="color:#0277BD">NT$106,274</strong>（含渡輪）</div>${html}</div>`;
+  el.innerHTML=`<div class="section"><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:3px">🏨 住宿總覽</div><div style="font-size:16px;color:#7A6A5A;margin-bottom:14px">9晚合計：<strong style="color:#B8826A">NT$106,274</strong>（含渡輪）</div>${html}</div>`;
 }
 
 // ─── EXPENSE ───
@@ -510,29 +582,29 @@ function rExp(el){
   const d1=new Date("2026-06-26"),diff=Math.floor((new Date()-d1)/86400000)+1,td=Math.min(Math.max(diff,1),10);
   const todayN=ST.exps.filter(e=>e.day===td).reduce((s,e)=>s+toTWD(e.amt,e.cur),0);
   const rows=ST.exps.sort((a,b)=>new Date(b.ts)-new Date(a.ts)).map(e=>{
-    const twd=toTWD(e.amt,e.cur),c=DC[e.day]||"#0277BD";
-    return`<div style="background:#fff;border-radius:12px;border:1px solid #E1EEF6;border-left:3px solid ${c};padding:11px 13px">
+    const twd=toTWD(e.amt,e.cur),c=DC[e.day]||"#B8826A";
+    return`<div style="background:#fff;border-radius:12px;border:1px solid #E8E2D6;border-left:3px solid ${c};padding:11px 13px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
             <span style="font-size:18px">${e.cat.split(" ")[0]}</span>
-            <span style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;max-width:130px;white-space:nowrap">${e.label||"（未命名）"}</span>
+            <span style="font-weight:600;font-size:16px;overflow:hidden;text-overflow:ellipsis;max-width:130px;white-space:nowrap">${e.label||"（未命名）"}</span>
             <span class="tag" style="background:${c}18;color:${c}">D${e.day} ${DM2[e.day]||""}</span>
           </div>
-          <div style="font-size:11px;color:#90A4AE;margin-top:2px">${e.who||""}${e.ts?" · "+new Date(e.ts).toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):""}</div>
+          <div style="font-size:16px;color:#B8A890;margin-top:2px">${e.who||""}${e.ts?" · "+new Date(e.ts).toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):""}</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
-          <div style="font-weight:600;font-size:14px">${e.cur} ${nf(e.amt)}</div>
-          ${twd?`<div style="font-size:11px;color:#546E7A">≈NT$${nf(twd)}</div>`:""}
+          <div style="font-weight:600;font-size:16px">${e.cur} ${nf(e.amt)}</div>
+          ${twd?`<div style="font-size:16px;color:#7A6A5A">≈NT$${nf(twd)}</div>`:""}
           <div style="display:flex;gap:4px;margin-top:3px;justify-content:flex-end">
-            <button onclick="openExpEdit('${e.id}')" style="background:#F0F9FF;border:1px solid #D1EAF5;border-radius:7px;cursor:pointer;font-size:12px;padding:2px 7px;color:#0277BD;font-family:inherit">✏️</button>
-            <button onclick="delExp('${e.id}')" style="background:#FFF0F0;border:1px solid #FFCDD2;border-radius:7px;cursor:pointer;font-size:12px;padding:2px 7px;color:#C62828;font-family:inherit">🗑</button>
+            <button onclick="openExpEdit('${e.id}')" style="background:#FAF6EE;border:1px solid #E0D8CC;border-radius:7px;cursor:pointer;font-size:16px;padding:2px 7px;color:#B8826A;font-family:inherit">✏️</button>
+            <button onclick="delExp('${e.id}')" style="background:#FFF0F0;border:1px solid #FFCDD2;border-radius:7px;cursor:pointer;font-size:16px;padding:2px 7px;color:#C05A40;font-family:inherit">🗑</button>
           </div>
         </div>
       </div>
     </div>`;
   }).join("");
-  el.innerHTML=`<div class="section"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px"><div style="background:#01579B;border-radius:14px;padding:13px 14px;color:#fff"><div style="font-size:11px;opacity:.8;margin-bottom:3px">旅途合計</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600">NT$ ${nf(total)}</div><div style="font-size:11px;opacity:.7;margin-top:2px">${ST.exps.length}筆 · 每人≈NT$${nf(total/9)}</div></div><div style="background:#00695C;border-radius:14px;padding:13px 14px;color:#fff"><div style="font-size:11px;opacity:.8;margin-bottom:3px">今日 D${td} ${DM2[td]||""}</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600">NT$ ${nf(todayN)}</div><div style="font-size:11px;opacity:.7;margin-top:2px">${ST.exps.filter(e=>e.day===td).length}筆</div></div></div><div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-p" onclick="openExpAdd()">＋ 記帳</button></div>${ST.exps.length===0?`<div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;padding:30px 20px;text-align:center;color:#90A4AE"><div style="font-size:40px;margin-bottom:8px">🧾</div><div style="font-weight:600">點 ＋記帳 開始記錄</div></div>`:`<div style="display:flex;flex-direction:column;gap:7px">${rows}</div>`}</div>${(ST.addExp||ST.editExpId)?expModal():""}`;
+  el.innerHTML=`<div class="section"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px"><div style="background:linear-gradient(135deg,#5A4A40,#7A6A5A);border-radius:14px;padding:13px 14px;color:#fff"><div style="font-size:16px;opacity:.8;margin-bottom:3px">旅途合計</div><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700">NT$ ${nf(total)}</div><div style="font-size:16px;opacity:.7;margin-top:2px">${ST.exps.length}筆 · 每人≈NT$${nf(total/9)}</div></div><div style="background:linear-gradient(135deg,#B8826A,#C8957A);border-radius:14px;padding:13px 14px;color:#fff"><div style="font-size:16px;opacity:.8;margin-bottom:3px">今日 D${td} ${DM2[td]||""}</div><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700">NT$ ${nf(todayN)}</div><div style="font-size:16px;opacity:.7;margin-top:2px">${ST.exps.filter(e=>e.day===td).length}筆</div></div></div><div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-p" onclick="openExpAdd()">＋ 記帳</button></div>${ST.exps.length===0?`<div style="background:#fff;border-radius:14px;border:1px solid #E8E2D6;padding:30px 20px;text-align:center;color:#B8A890"><div style="font-size:40px;margin-bottom:8px">🧾</div><div style="font-weight:600">點 ＋記帳 開始記錄</div></div>`:`<div style="display:flex;flex-direction:column;gap:7px">${rows}</div>`}</div>${(ST.addExp||ST.editExpId)?expModal():""}`;
 }
 function openExpAdd(){
   const d1=new Date("2026-06-26"),diff=Math.floor((new Date()-d1)/86400000)+1;
@@ -563,35 +635,58 @@ function saveExp2(){
 }
 function expModal(){
   const f=ST.expForm,isEd=!!ST.editExpId,twd=f.amt?toTWD(f.amt,f.cur):0;
-  return`<div class="modal-bg" onclick="if(event.target===this)closeExp()"><div class="modal"><div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0277BD;margin-bottom:12px">${isEd?"✏️ 編輯":"＋ 新增"}費用</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px">${ECATS.map(c=>`<button onclick="ST.expForm.cat='${c}';render()" style="padding:6px 10px;border-radius:16px;border:2px solid ${f.cat===c?"#0277BD":"#D1EAF5"};background:${f.cat===c?"#EEF6FC":"#fff"};color:${f.cat===c?"#0277BD":"#546E7A"};font-size:12px;font-weight:${f.cat===c?600:400};cursor:pointer;font-family:inherit;min-height:36px">${c}</button>`).join("")}</div><div style="display:flex;flex-direction:column;gap:8px"><input class="inp" value="${(f.label||"").replace(/"/g,"&quot;")}" oninput="ST.expForm.label=this.value" placeholder="說明（拉麵・油資・門票）"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><input class="inp" type="text" inputmode="decimal" value="${f.amt||""}" oninput="ST.expForm.amt=this.value" placeholder="金額">${twd?`<div style="font-size:11px;color:#546E7A;margin-top:2px">≈NT$${nf(twd)}</div>`:""}</div><select class="inp" onchange="ST.expForm.cur=this.value"><option value="JPY" ${f.cur==="JPY"?"selected":""}>¥ 日圓</option><option value="TWD" ${f.cur==="TWD"?"selected":""}>NT$ 台幣</option><option value="KRW" ${f.cur==="KRW"?"selected":""}>₩ 韓圓</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><select class="inp" onchange="ST.expForm.who=this.value">${["共同","Claudia","Cony","Penny","張爸","張媽"].map(p=>`<option value="${p}" ${f.who===p?"selected":""}>${p}</option>`).join("")}</select><select class="inp" onchange="ST.expForm.day=Number(this.value)">${Array.from({length:10},(_,i)=>i+1).map(d=>`<option value="${d}" ${f.day===d?"selected":""}>D${d} ${DM2[d]||""}</option>`).join("")}</select></div><div style="display:flex;gap:8px;margin-top:3px"><button class="btn-p" style="flex:1" onclick="saveExp2()">${isEd?"儲存 ✓":"記帳 ✓"}</button><button class="btn-g" onclick="closeExp()">取消</button></div></div></div></div>`;
+  return`<div class="modal-bg" onclick="if(event.target===this)closeExp()"><div class="modal"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#B8826A;margin-bottom:12px">${isEd?"✏️ 編輯":"＋ 新增"}費用</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px">${ECATS.map(c=>`<button onclick="ST.expForm.cat='${c}';render()" style="padding:6px 10px;border-radius:16px;border:2px solid ${f.cat===c?"#B8826A":"#E0D8CC"};background:${f.cat===c?"#F5F0E8":"#fff"};color:${f.cat===c?"#B8826A":"#7A6A5A"};font-size:16px;font-weight:${f.cat===c?600:400};cursor:pointer;font-family:inherit;min-height:36px">${c}</button>`).join("")}</div><div style="display:flex;flex-direction:column;gap:8px"><input class="inp" value="${(f.label||"").replace(/"/g,"&quot;")}" oninput="ST.expForm.label=this.value" placeholder="說明（拉麵・油資・門票）"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><input class="inp" type="text" inputmode="decimal" value="${f.amt||""}" oninput="ST.expForm.amt=this.value" placeholder="金額">${twd?`<div style="font-size:16px;color:#7A6A5A;margin-top:2px">≈NT$${nf(twd)}</div>`:""}</div><select class="inp" onchange="ST.expForm.cur=this.value"><option value="JPY" ${f.cur==="JPY"?"selected":""}>¥ 日圓</option><option value="TWD" ${f.cur==="TWD"?"selected":""}>NT$ 台幣</option><option value="KRW" ${f.cur==="KRW"?"selected":""}>₩ 韓圓</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><select class="inp" onchange="ST.expForm.who=this.value">${["共同","Claudia","Cony","Penny","張爸","張媽"].map(p=>`<option value="${p}" ${f.who===p?"selected":""}>${p}</option>`).join("")}</select><select class="inp" onchange="ST.expForm.day=Number(this.value)">${Array.from({length:10},(_,i)=>i+1).map(d=>`<option value="${d}" ${f.day===d?"selected":""}>D${d} ${DM2[d]||""}</option>`).join("")}</select></div><div style="display:flex;gap:8px;margin-top:3px"><button class="btn-p" style="flex:1" onclick="saveExp2()">${isEd?"儲存 ✓":"記帳 ✓"}</button><button class="btn-g" onclick="closeExp()">取消</button></div></div></div></div>`;
 }
 
 // ─── AI ───
+const AI_SYS="你是「旅遊小幫手 TripBot」，為2026年6月26-7月5日的釜山九州家族旅行（9人）服務。行程：釜山D1-D3→博多別府D4→黒川D5→阿蘇高千穗D6→熊本D7→福岡D8-D10。你能幫助：日韓語翻譯、景點介紹、行程建議、緊急應對、文化禮儀。用繁體中文回答，語氣輕鬆親切，適當加emoji，回答簡潔（200字以內）。";
+
+async function askGeminiDirect(msgs){
+  const key=sg("t26_gkey","");
+  if(!key)return null;
+  try{
+    const res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+key,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        contents:msgs.map(m=>({role:m.role==="assistant"?"model":"user",parts:[{text:m.content}]})),
+        systemInstruction:{parts:[{text:AI_SYS}]}
+      })
+    });
+    const d=await res.json();
+    return d.candidates?.[0]?.content?.parts?.[0]?.text||null;
+  }catch(e){return null;}
+}
+
 async function sendAI(){
   const msg=ST.aiIn.trim();if(!msg||ST.aiLoad)return;
   const hist=[...ST.aiHist,{role:"user",content:msg}];
   ST.aiHist=hist;ST.aiIn="";ST.aiLoad=true;render();
   setTimeout(()=>{const c=document.getElementById("chatA");if(c)c.scrollTop=c.scrollHeight;},50);
   try{
-    if(!ST.apiUrl){
-      ST.aiHist=[...hist,{role:"assistant",content:"⚠️ 請先在「更多 → 設定」填入 Google Apps Script URL，AI 助手才能使用。"}];
-    } else {
+    let reply=null;
+    // 1st: try Apps Script proxy
+    if(ST.apiUrl){
       const r=await apiCall("ask_ai",{messages:hist.map(m=>({role:m.role,content:m.content}))});
-      const reply=(r&&r.ok&&r.reply)?r.reply:"抱歉，無法回覆，請確認 API 設定。";
-      ST.aiHist=[...hist,{role:"assistant",content:reply}];
+      if(r&&r.ok&&r.reply)reply=r.reply;
     }
-  }catch(e){ST.aiHist=[...hist,{role:"assistant",content:"連線失敗 🙏 請確認 API URL 是否正確。"}];}
+    // 2nd: try direct Gemini API (user's own key in settings)
+    if(!reply)reply=await askGeminiDirect(hist);
+    // 3rd: fallback message with useful links
+    if(!reply)reply="__NO_AI__";
+    ST.aiHist=[...hist,{role:"assistant",content:reply}];
+  }catch(e){ST.aiHist=[...hist,{role:"assistant",content:"__NO_AI__"}];}
   ST.aiLoad=false;render();
   setTimeout(()=>{const c=document.getElementById("chatA");if(c)c.scrollTop=c.scrollHeight;},50);
 }
 function rAI(el){
-  const qs=["用日文說『謝謝』怎麼說？","別府地獄巡り要多久？","在日本搭車要注意什麼？","韓國超市必買清單"];
-  const msgs=ST.aiHist.map(m=>`<div class="bubble ${m.role==="user"?"u":"a"}">${m.content.replace(/\n/g,"<br>").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/&lt;br&gt;/g,"<br>")}</div>`).join("");
-  el.innerHTML=`<div class="chat-wrap"><div class="chat-area" id="chatA">${ST.aiHist.length===0?`<div style="text-align:center;padding:24px 16px;color:#546E7A"><div style="font-size:40px;margin-bottom:10px">🤖</div><div style="font-weight:600;font-size:16px;margin-bottom:8px">旅遊小幫手 TripBot</div><div style="font-size:13px;line-height:1.7">你好！我是你們的旅遊助理。<br>可以問我任何旅行相關問題！</div><div style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:12px">${qs.map(q=>`<button onclick="ST.aiIn='${q}';sendAI()" style="background:#EEF6FC;border:1px solid #D1EAF5;border-radius:20px;padding:7px 12px;font-size:12px;color:#0277BD;cursor:pointer;font-family:inherit">${q}</button>`).join("")}</div></div>`:""}${msgs}${ST.aiLoad?`<div class="typing"><span></span><span></span><span></span></div>`:""}</div><div style="flex-shrink:0;padding:10px 14px;border-top:1px solid #E1EEF6;background:#fff;display:flex;gap:8px;align-items:center"><input class="inp" style="flex:1;padding:11px 14px;border-radius:22px" value="${ST.aiIn.replace(/"/g,"&quot;")}" oninput="ST.aiIn=this.value" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI()}" placeholder="問問題…（Enter 送出）" id="aiInp"><button onclick="sendAI()" style="background:#0277BD;border:none;border-radius:50%;width:44px;height:44px;cursor:pointer;font-size:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff" ${ST.aiLoad?"disabled":""}>→</button></div></div>`;
-  setTimeout(()=>{if(!ST.aiLoad){const inp=document.getElementById("aiInp");if(inp)inp.value=ST.aiIn;}},50);
+  el.innerHTML=
+    '<div style="padding:18px 16px 80px">'+
+    '<div style="font-family:\'Playfair Display\',serif;font-size:22px;font-weight:600;color:#2C2420;margin-bottom:2px">旅行工具箱</div>'+
+    '<div style="font-size:16px;color:#B8A890;margin-bottom:4px">出門在外，一鍵直達</div>'+
+    '<div style="font-size:16px;font-weight:700;color:#B8A890;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;margin-top:18px">AI 助理</div>'+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">'+'<a href="https://chat.openai.com" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#8A9E7E20;display:flex;align-items:center;justify-content:center;font-size:20px">💬</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">ChatGPT</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">AI 對話助理</div>'+'</a>'+'<a href="https://gemini.google.com/app" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#7A8FA620;display:flex;align-items:center;justify-content:center;font-size:20px">✦</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Gemini</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">Google AI 助手</div>'+'</a>'+'</div>'+'<div style="font-size:16px;font-weight:700;color:#B8A890;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;margin-top:18px">翻譯工具</div>'+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">'+'<a href="https://papago.naver.com" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#9E8AB020;display:flex;align-items:center;justify-content:center;font-size:20px">🟢</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Papago</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">韓日中翻譯</div>'+'</a>'+'<a href="https://translate.google.com/?hl=zh-TW" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#B8A07A20;display:flex;align-items:center;justify-content:center;font-size:20px">🌐</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Google 翻譯</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">多國語言翻譯</div>'+'</a>'+'<a href="https://translate.google.com/?sl=ja&tl=zh-TW" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#8A9E6E20;display:flex;align-items:center;justify-content:center;font-size:20px">🇯🇵</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">日→中翻譯</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">日文即時翻譯</div>'+'</a>'+'<a href="https://translate.google.com/?sl=ko&tl=zh-TW" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#C5927A20;display:flex;align-items:center;justify-content:center;font-size:20px">🇰🇷</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">韓→中翻譯</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">韓文即時翻譯</div>'+'</a>'+'</div>'+'<div style="font-size:16px;font-weight:700;color:#B8A890;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;margin-top:18px">地圖導航</div>'+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">'+'<a href="https://maps.google.com" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#7A9E9A20;display:flex;align-items:center;justify-content:center;font-size:20px">🗺️</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Google 地圖</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">導航 & 搜尋</div>'+'</a>'+'<a href="https://map.naver.com" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#7A8FA620;display:flex;align-items:center;justify-content:center;font-size:20px">🧭</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Naver 地圖</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">韓國必備導航</div>'+'</a>'+'</div>'+'<div style="font-size:16px;font-weight:700;color:#B8A890;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;margin-top:18px">其他工具</div>'+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">'+'<a href="https://photos.app.goo.gl/w1aDwmtASJP9siVg7" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#B08AB020;display:flex;align-items:center;justify-content:center;font-size:20px">📸</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Google 相簿</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">家族共用相簿</div>'+'</a>'+'<a href="https://www.google.com" target="_blank" style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:#fff;border:1px solid #EDE8E0;border-radius:14px;padding:16px 15px;text-decoration:none;transition:box-shadow .15s">'+'<div style="width:38px;height:38px;border-radius:10px;background:#9E9E8A20;display:flex;align-items:center;justify-content:center;font-size:20px">🔍</div>'+'<div style="font-size:16px;font-weight:600;color:#2C2420">Google 搜尋</div>'+'<div style="font-size:16px;color:#9E8E7E;line-height:1.3">查景點 & 資訊</div>'+'</a>'+'</div>'+
+    '</div>';
 }
 
-// ─── MORE ───
 function rMore(el){
   const pg=ST.morePg;
   if(pg==="pax")return rPax(el);
@@ -600,18 +695,18 @@ function rMore(el){
   if(pg==="emergency")return rEmergency(el);
   if(pg==="settings")return rSettings(el);
   const pages=[{id:"pax",ic:"👥",l:"旅客清冊",d:"護照・聯絡資訊"},{id:"album",ic:"📸",l:"Google共用相簿",d:"全家共享照片"},{id:"budget",ic:"💰",l:"預算概覽",d:"費用彙整"},{id:"emergency",ic:"🆘",l:"緊急聯絡",d:"SOS電話"},{id:"settings",ic:"⚙️",l:"匯率設定",d:"JPY/KRW換算"}];
-  el.innerHTML=`<div class="section"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:14px">⋯ 更多功能</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${pages.map(p=>`<div onclick="sn('morePg','${p.id}')" style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;padding:15px 13px;cursor:pointer;min-height:86px;display:flex;flex-direction:column;gap:7px"><span style="font-size:30px">${p.ic}</span><div><div style="font-size:14px;font-weight:600">${p.l}</div><div style="font-size:11px;color:#90A4AE;margin-top:2px">${p.d}</div></div></div>`).join("")}</div><div style="background:linear-gradient(135deg,#E1F5FE,#E0F7FA);border-radius:14px;padding:12px 14px;border:1px solid #D1EAF5"><div style="font-weight:600;font-size:13px;color:#0277BD;margin-bottom:4px">📱 eSIM 已購買 × 5 張</div><div style="font-size:12px;color:#546E7A;line-height:1.7">日本＋韓國 雙國無限流量・10天有效<br>出發前掃描 QR Code 安裝即可</div></div></div>`;
+  el.innerHTML=`<div class="section"><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:14px">⋯ 更多功能</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${pages.map(p=>`<div onclick="sn('morePg','${p.id}')" style="background:#fff;border-radius:14px;border:1px solid #E8E2D6;padding:15px 13px;cursor:pointer;min-height:86px;display:flex;flex-direction:column;gap:7px"><span style="font-size:30px">${p.ic}</span><div><div style="font-size:16px;font-weight:600">${p.l}</div><div style="font-size:16px;color:#B8A890;margin-top:2px">${p.d}</div></div></div>`).join("")}</div><div style="background:linear-gradient(135deg,#EEF2E8,#EEF2E8);border-radius:14px;padding:12px 14px;border:1px solid #E0D8CC"><div style="font-weight:600;font-size:16px;color:#B8826A;margin-bottom:4px">📱 eSIM 已購買 × 5 張</div><div style="font-size:16px;color:#7A6A5A;line-height:1.7">日本＋韓國 雙國無限流量・10天有效<br>出發前掃描 QR Code 安裝即可</div></div></div>`;
 }
 function backMore(){sn("morePg","menu");}
-function mH(t){return`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px 4px"><button onclick="backMore()" style="background:none;border:none;cursor:pointer;color:#0277BD;font-size:24px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center">←</button><div style="font-weight:600;font-size:16px">${t}</div></div>`;}
+function mH(t){return`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px 4px"><button onclick="backMore()" style="background:none;border:none;cursor:pointer;color:#B8826A;font-size:24px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center">←</button><div style="font-weight:600;font-size:16px">${t}</div></div>`;}
 
 function rPax(el){
   const TC={adult:"#1565C0",child:"#2E7D32",infant:"#6A1B9A"},TL={adult:"成人",child:"兒童",infant:"幼兒"};
   const items=ST.travelers.map(t=>{
-    const c=TC[t.kid]||"#0277BD",isE=ST.paxEdit===t.id;
-    return`<div class="card"><div class="card-top" style="background:${c}"></div><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;gap:7px"><div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><span style="font-size:26px;flex-shrink:0">${t.icon}</span><div style="min-width:0"><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap"><span style="font-weight:600;font-size:14px">${t.zh}</span><span class="pill" style="background:${c}18;color:${c}">${TL[t.kid]||"成人"}</span><span style="font-size:11px;color:#90A4AE">${t.role}</span></div><div style="font-size:12px;color:#546E7A;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.en?`<span style="font-family:monospace;color:#0277BD;font-weight:600">${t.en}</span>`:"<span style='color:#90A4AE;font-style:italic'>英文姓名未填</span>"}${t.passport?` 🛂${t.passport}`:""}</div>${t.phone||t.born?`<div style="font-size:11px;color:#90A4AE;margin-top:1px">${t.born?`📅${t.born} `:""}${t.phone?`📞${t.phone}`:""}</div>`:""}</div></div><button onclick="${isE?`sn('paxEdit',null)`:`ST.paxDraft={...ST.travelers.find(x=>x.id===${t.id})};sn('paxEdit',${t.id})`}" style="background:${isE?"#0277BD":"#F0F9FF"};color:${isE?"#fff":"#0277BD"};border:1px solid #D1EAF5;border-radius:20px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;min-height:36px;flex-shrink:0">${isE?"關閉":"✏️"}</button></div>${isE?`<div style="margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px">${[["英文姓名","en","CHANG CHIH-JUI"],["護照號碼","passport","A12345678"],["生日","born","1984-01-01"],["手機","phone","886-912-345678"],["性別","gender","F"],["國籍","nationality","ROC Taiwan"]].map(([l,k,ph])=>`<div><div style="font-size:11px;color:#546E7A;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">${l}</div><input class="inp" style="font-size:14px" value="${(ST.paxDraft[k]||"").replace(/"/g,"&quot;")}" oninput="ST.paxDraft['${k}']=this.value" placeholder="${ph}"></div>`).join("")}<div style="grid-column:1/-1"><button class="btn-p" onclick="savePax(${t.id})">儲存 ✓</button></div></div>`:""}</div></div>`;
+    const c=TC[t.kid]||"#B8826A",isE=ST.paxEdit===t.id;
+    return`<div class="card"><div class="card-top" style="background:${c}"></div><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;gap:7px"><div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><span style="font-size:26px;flex-shrink:0">${t.icon}</span><div style="min-width:0"><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap"><span style="font-weight:600;font-size:16px">${t.zh}</span><span class="pill" style="background:${c}18;color:${c}">${TL[t.kid]||"成人"}</span><span style="font-size:16px;color:#B8A890">${t.role}</span></div><div style="font-size:16px;color:#7A6A5A;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.en?`<span style="font-family:monospace;color:#B8826A;font-weight:600">${t.en}</span>`:"<span style='color:#B8A890;font-style:italic'>英文姓名未填</span>"}${t.passport?` 🛂${t.passport}`:""}</div>${t.phone||t.born?`<div style="font-size:16px;color:#B8A890;margin-top:1px">${t.born?`📅${t.born} `:""}${t.phone?`📞${t.phone}`:""}</div>`:""}</div></div><button onclick="${isE?`sn('paxEdit',null)`:`ST.paxDraft={...ST.travelers.find(x=>x.id===${t.id})};sn('paxEdit',${t.id})`}" style="background:${isE?"#B8826A":"#FAF6EE"};color:${isE?"#fff":"#B8826A"};border:1px solid #E0D8CC;border-radius:20px;padding:6px 12px;cursor:pointer;font-size:16px;font-weight:600;font-family:inherit;min-height:36px;flex-shrink:0">${isE?"關閉":"✏️"}</button></div>${isE?`<div style="margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px">${[["英文姓名","en","CHANG CHIH-JUI"],["護照號碼","passport","A12345678"],["生日","born","1984-01-01"],["手機","phone","886-912-345678"],["性別","gender","F"],["國籍","nationality","ROC Taiwan"]].map(([l,k,ph])=>`<div><div style="font-size:16px;color:#7A6A5A;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">${l}</div><input class="inp" style="font-size:16px" value="${(ST.paxDraft[k]||"").replace(/"/g,"&quot;")}" oninput="ST.paxDraft['${k}']=this.value" placeholder="${ph}"></div>`).join("")}<div style="grid-column:1/-1"><button class="btn-p" onclick="savePax(${t.id})">儲存 ✓</button></div></div>`:""}</div></div>`;
   }).join("");
-  el.innerHTML=mH("👥 旅客清冊")+`<div class="section" style="padding-top:8px"><div style="font-size:12px;color:#546E7A;margin-bottom:12px">護照資訊儲存在此裝置的本地儲存空間中。</div>${items}</div>`;
+  el.innerHTML=mH("👥 旅客清冊")+`<div class="section" style="padding-top:8px"><div style="font-size:16px;color:#7A6A5A;margin-bottom:12px">護照資訊儲存在此裝置的本地儲存空間中。</div>${items}</div>`;
 }
 function savePax(id){
   const travelers=ST.travelers.map(t=>t.id===id?{...t,...ST.paxDraft}:t);
@@ -621,7 +716,7 @@ function savePax(id){
 function rAlbum(el){
   const url=ST.albumUrl;
   const qr=url?`https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=${encodeURIComponent(url)}`:"";
-  el.innerHTML=mH("📸 Google 共用相簿")+`<div class="section" style="padding-top:8px"><div style="font-size:13px;color:#546E7A;margin-bottom:14px;line-height:1.7">在 Google 相簿建立「共用相簿」後，貼入連結讓全家人都能看到和上傳照片。</div><div style="margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:#546E7A;margin-bottom:6px">相簿連結</div><input class="inp" id="albumInp" value="${(url||"").replace(/"/g,"&quot;")}" placeholder="https://photos.app.goo.gl/..."></div><div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn-p" onclick="const v=document.getElementById('albumInp').value;set('albumUrl',v)">儲存連結</button>${url?`<a href="${url}" target="_blank" class="btn-g" style="text-decoration:none;display:inline-flex;align-items:center">開啟相簿 ↗</a>`:""}</div>${url&&qr?`<div style="text-align:center"><div style="font-size:12px;color:#546E7A;margin-bottom:8px">📷 掃碼開啟（手機適用）</div><img src="${qr}" alt="QR" style="width:140px;height:140px;border-radius:10px;border:1px solid #E1EEF6"></div>`:"<div style='background:#F0F9FF;border-radius:12px;padding:20px;text-align:center;color:#90A4AE;font-size:13px'>尚未設定相簿連結</div>"}</div>`;
+  el.innerHTML=mH("📸 Google 共用相簿")+`<div class="section" style="padding-top:8px"><div style="font-size:16px;color:#7A6A5A;margin-bottom:14px;line-height:1.7">在 Google 相簿建立「共用相簿」後，貼入連結讓全家人都能看到和上傳照片。</div><div style="margin-bottom:10px"><div style="font-size:16px;font-weight:600;color:#7A6A5A;margin-bottom:6px">相簿連結</div><input class="inp" id="albumInp" value="${(url||"").replace(/"/g,"&quot;")}" placeholder="https://photos.app.goo.gl/..."></div><div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn-p" onclick="const v=document.getElementById('albumInp').value;set('albumUrl',v)">儲存連結</button>${url?`<a href="${url}" target="_blank" class="btn-g" style="text-decoration:none;display:inline-flex;align-items:center">開啟相簿 ↗</a>`:""}</div>${url&&qr?`<div style="text-align:center"><div style="font-size:16px;color:#7A6A5A;margin-bottom:8px">📷 掃碼開啟（手機適用）</div><img src="${qr}" alt="QR" style="width:140px;height:140px;border-radius:10px;border:1px solid #E8E2D6"></div>`:"<div style='background:#FAF6EE;border-radius:12px;padding:20px;text-align:center;color:#B8A890;font-size:16px'>尚未設定相簿連結</div>"}</div>`;
 }
 
 function getBudgetItems(){return ST.budgetItems&&ST.budgetItems.length?ST.budgetItems:DEF_BUDGET;}
@@ -641,33 +736,33 @@ function rBudget(el){
   const rows=items.map((it,i)=>{
     const isEd=editId===it.id;
     const twd=toTWD2(it.total,it.cur);
-    if(isEd)return`<div style="padding:11px 14px;border-bottom:1px solid #E1EEF6;background:#F8FFFE">
+    if(isEd)return`<div style="padding:11px 14px;border-bottom:1px solid #E8E2D6;background:#FAF7F2">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
-        <input class="inp" style="font-size:14px" value="${(draft.cat||it.cat).replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.cat=this.value" placeholder="類別">
-        <input class="inp" style="font-size:14px" value="${(draft.label||it.label).replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.label=this.value" placeholder="說明">
-        <div><input class="inp" style="font-size:14px" type="text" inputmode="decimal" value="${draft.total!==undefined?draft.total:it.total}" oninput="ST.budgetDraft.total=this.value" placeholder="金額"></div>
-        <select class="inp" style="font-size:14px" onchange="ST.budgetDraft.cur=this.value"><option value="TWD" ${(draft.cur||it.cur)==="TWD"?"selected":""}>NT$ 台幣</option><option value="JPY" ${(draft.cur||it.cur)==="JPY"?"selected":""}>¥ 日圓</option><option value="KRW" ${(draft.cur||it.cur)==="KRW"?"selected":""}>₩ 韓圓</option></select>
-        <input class="inp" style="font-size:14px" value="${(draft.ref||it.ref||"").replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.ref=this.value" placeholder="訂單號">
-        <button onclick="ST.budgetDraft.paid=!('paid' in ST.budgetDraft?ST.budgetDraft.paid:it.paid);render()" style="background:${'paid' in draft?(draft.paid?"#E1F5FE":"#FFF8E1"):(it.paid?"#E1F5FE":"#FFF8E1")};border:1.5px solid #D1EAF5;border-radius:10px;padding:10px;cursor:pointer;font-size:13px;font-family:inherit">${'paid' in draft?(draft.paid?"✅已付":"⏳待付"):(it.paid?"✅已付":"⏳待付")}</button>
+        <input class="inp" style="font-size:16px" value="${(draft.cat||it.cat).replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.cat=this.value" placeholder="類別">
+        <input class="inp" style="font-size:16px" value="${(draft.label||it.label).replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.label=this.value" placeholder="說明">
+        <div><input class="inp" style="font-size:16px" type="text" inputmode="decimal" value="${draft.total!==undefined?draft.total:it.total}" oninput="ST.budgetDraft.total=this.value" placeholder="金額"></div>
+        <select class="inp" style="font-size:16px" onchange="ST.budgetDraft.cur=this.value"><option value="TWD" ${(draft.cur||it.cur)==="TWD"?"selected":""}>NT$ 台幣</option><option value="JPY" ${(draft.cur||it.cur)==="JPY"?"selected":""}>¥ 日圓</option><option value="KRW" ${(draft.cur||it.cur)==="KRW"?"selected":""}>₩ 韓圓</option></select>
+        <input class="inp" style="font-size:16px" value="${(draft.ref||it.ref||"").replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.ref=this.value" placeholder="訂單號">
+        <button onclick="ST.budgetDraft.paid=!('paid' in ST.budgetDraft?ST.budgetDraft.paid:it.paid);render()" style="background:${'paid' in draft?(draft.paid?"#EEF2E8":"#FFF8E1"):(it.paid?"#EEF2E8":"#FFF8E1")};border:1.5px solid #E0D8CC;border-radius:10px;padding:10px;cursor:pointer;font-size:16px;font-family:inherit">${'paid' in draft?(draft.paid?"✅已付":"⏳待付"):(it.paid?"✅已付":"⏳待付")}</button>
       </div>
       <div style="display:flex;gap:7px">
-        <button class="btn-p" style="flex:1;font-size:13px" onclick="saveBudgetEdit('${it.id}')">儲存 ✓</button>
-        <button class="btn-g" style="font-size:13px" onclick="sn('budgetEditId',null)">取消</button>
+        <button class="btn-p" style="flex:1;font-size:16px" onclick="saveBudgetEdit('${it.id}')">儲存 ✓</button>
+        <button class="btn-g" style="font-size:16px" onclick="sn('budgetEditId',null)">取消</button>
       </div>
     </div>`;
-    return`<div style="padding:11px 14px${i<items.length-1?";border-bottom:1px solid #E1EEF6":""}">
+    return`<div style="padding:11px 14px${i<items.length-1?";border-bottom:1px solid #E8E2D6":""}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
         <div style="flex:1;min-width:0">
           <div style="display:flex;gap:5px;align-items:center;margin-bottom:2px;flex-wrap:wrap">
-            <span style="font-size:12px;font-weight:600">${it.cat}</span>
-            <span class="tag" style="background:${it.paid?"#E1F5FE":"#FFF8E1"};color:${it.paid?"#01579B":"#E65100"}">${it.paid?"✅已付":"⏳待付"}</span>
+            <span style="font-size:16px;font-weight:600">${it.cat}</span>
+            <span class="tag" style="background:${it.paid?"#EEF2E8":"#FFF8E1"};color:${it.paid?"#2C2420":"#E65100"}">${it.paid?"✅已付":"⏳待付"}</span>
           </div>
-          <div style="font-size:13px">${it.label}</div>
-          ${it.ref?`<div style="font-size:11px;color:#0277BD;font-family:monospace">${it.ref}</div>`:""}
+          <div style="font-size:16px">${it.label}</div>
+          ${it.ref?`<div style="font-size:16px;color:#B8826A;font-family:monospace">${it.ref}</div>`:""}
         </div>
         <div style="text-align:right;flex-shrink:0">
-          <div style="font-weight:600;font-size:13px">${it.cur!=="TWD"?`${it.cur} ${nf(it.total)}→`:""} NT$ ${nf(twd)}</div>
-          <button onclick="ST.budgetEditId='${it.id}';ST.budgetDraft={};render()" style="background:none;border:none;cursor:pointer;color:#90A4AE;font-size:12px;margin-top:3px;font-family:inherit;min-height:28px">✏️ 編輯</button>
+          <div style="font-weight:600;font-size:16px">${it.cur!=="TWD"?`${it.cur} ${nf(it.total)}→`:""} NT$ ${nf(twd)}</div>
+          <button onclick="ST.budgetEditId='${it.id}';ST.budgetDraft={};render()" style="background:none;border:none;cursor:pointer;color:#B8A890;font-size:16px;margin-top:3px;font-family:inherit;min-height:28px">✏️ 編輯</button>
         </div>
       </div>
     </div>`;
@@ -676,38 +771,38 @@ function rBudget(el){
   const ppRows=ppl.map(p=>{
     const own=personalMap[p]||0;
     const total=own+perPplFromShared;
-    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #E1EEF6">
-      <span style="font-size:13px">${p}</span>
-      <div style="text-align:right"><div style="font-size:13px;font-weight:600">NT$ ${nf(total)}</div><div style="font-size:11px;color:#90A4AE">個人 ${nf(own)} + 共同分攤 ${nf(perPplFromShared)}</div></div>
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #E8E2D6">
+      <span style="font-size:16px">${p}</span>
+      <div style="text-align:right"><div style="font-size:16px;font-weight:600">NT$ ${nf(total)}</div><div style="font-size:16px;color:#B8A890">個人 ${nf(own)} + 共同分攤 ${nf(perPplFromShared)}</div></div>
     </div>`;
   }).join("");
   
   el.innerHTML=mH("💰 預算概覽")+`<div class="section" style="padding-top:8px">
     <!-- Summary Cards -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <div style="background:#01579B;border-radius:14px;padding:12px 13px;color:#fff">
-        <div style="font-size:11px;opacity:.8;margin-bottom:3px">固定費用</div>
+      <div style="background:#5A4A40;border-radius:14px;padding:12px 13px;color:#fff">
+        <div style="font-size:16px;opacity:.8;margin-bottom:3px">固定費用</div>
         <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">NT$ ${nf(fixedTotal)}</div>
       </div>
-      <div style="background:#00695C;border-radius:14px;padding:12px 13px;color:#fff">
-        <div style="font-size:11px;opacity:.8;margin-bottom:3px">已記帳費用</div>
+      <div style="background:linear-gradient(135deg,#B8826A,#C8957A);border-radius:14px;padding:12px 13px;color:#fff">
+        <div style="font-size:16px;opacity:.8;margin-bottom:3px">已記帳費用</div>
         <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">NT$ ${nf(expTotal)}</div>
         <div style="font-size:10px;opacity:.7;margin-top:2px">${ST.exps.length}筆</div>
       </div>
-      <div style="background:#0277BD;border-radius:14px;padding:12px 13px;color:#fff;grid-column:1/-1">
-        <div style="font-size:11px;opacity:.8;margin-bottom:3px">預估總計（固定＋記帳）</div>
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600">NT$ ${nf(grandTotal)}</div>
-        <div style="font-size:11px;opacity:.7;margin-top:2px">每人平均 NT$ ${nf(grandTotal/9)}</div>
+      <div style="background:linear-gradient(135deg,#B8826A,#C8957A);border-radius:14px;padding:12px 13px;color:#fff;grid-column:1/-1">
+        <div style="font-size:16px;opacity:.8;margin-bottom:3px">預估總計（固定＋記帳）</div>
+        <div style="font-family:'Playfair Display',serif;font-size:23px;font-weight:700">NT$ ${nf(grandTotal)}</div>
+        <div style="font-size:16px;opacity:.7;margin-top:2px">每人平均 NT$ ${nf(grandTotal/9)}</div>
       </div>
     </div>
     <!-- Fixed Budget Items -->
-    <div style="font-weight:600;font-size:13px;color:#546E7A;margin-bottom:8px">固定預算（可編輯）</div>
-    <div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;overflow:hidden;margin-bottom:14px">${rows}</div>
+    <div style="font-weight:600;font-size:16px;color:#7A6A5A;margin-bottom:8px">固定預算（可編輯）</div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E8E2D6;overflow:hidden;margin-bottom:14px">${rows}</div>
     <!-- Per-person breakdown -->
-    <div style="font-weight:600;font-size:13px;color:#546E7A;margin-bottom:8px">個人消費統計（含共同分攤 NT$ ${nf(perPplFromShared)}/人）</div>
-    <div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;padding:4px 14px;margin-bottom:14px">${ppRows||"<div style='padding:14px 0;text-align:center;color:#90A4AE;font-size:13px'>尚無記帳資料</div>"}</div>
+    <div style="font-weight:600;font-size:16px;color:#7A6A5A;margin-bottom:8px">個人消費統計（含共同分攤 NT$ ${nf(perPplFromShared)}/人）</div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E8E2D6;padding:4px 14px;margin-bottom:14px">${ppRows||"<div style='padding:14px 0;text-align:center;color:#B8A890;font-size:16px'>尚無記帳資料</div>"}</div>
     <!-- Shared breakdown -->
-    <div style="background:#EEF6FC;border-radius:12px;padding:11px 14px;font-size:13px;color:#01579B">
+    <div style="background:#F5F0E8;border-radius:12px;padding:11px 14px;font-size:16px;color:#2C2420">
       共同支出：NT$ ${nf(sharedExp)}（${ST.exps.filter(e=>e.who==="共同").length}筆）→ 每人分攤 NT$ ${nf(perPplFromShared)}
     </div>
   </div>`;
@@ -728,29 +823,29 @@ function saveBudgetEdit(id){
 
 function rEmergency(el){
   const cts=[["🇰🇷 韓國急救","119"],["🇰🇷 韓國警察","112"],["🇯🇵 日本急救","119"],["🇯🇵 日本警察","110"],["🇹🇼 外交部緊急","+886-2-2343-2888"],["✈️ 中華航空","+886-2-2715-1212"],["🚢 新山茶花號","+82-51-999-3000"],["🏨 Encore 海雲台","+82-51-610-3000"],["♨ KAMENOI 黒川","0967-44-XXXX"],["🎨 Vessel 福岡","092-641-1234"],["📱 Claudia","886-919839970"]];
-  el.innerHTML=mH("🆘 緊急聯絡")+`<div class="section" style="padding-top:8px"><div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;overflow:hidden">${cts.map(([l,v],i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px${i<cts.length-1?";border-bottom:1px solid #E1EEF6":""}"><span style="font-size:13px">${l}</span><a href="tel:${v}" style="background:#01579B;color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap">${v}</a></div>`).join("")}</div></div>`;
+  el.innerHTML=mH("🆘 緊急聯絡")+`<div class="section" style="padding-top:8px"><div style="background:#fff;border-radius:14px;border:1px solid #E8E2D6;overflow:hidden">${cts.map(([l,v],i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px${i<cts.length-1?";border-bottom:1px solid #E8E2D6":""}"><span style="font-size:16px">${l}</span><a href="tel:${v}" style="background:#5A4A40;color:#fff;padding:6px 14px;border-radius:20px;font-size:16px;font-weight:600;text-decoration:none;white-space:nowrap">${v}</a></div>`).join("")}</div></div>`;
 }
 
 function rSettings(el){
   const r=ST.rates,apiUrl=ST.apiUrl||'';
   el.innerHTML=mH('⚙️ 設定')+
     '<div class="section" style="padding-top:8px">'+
-    '<div style="background:#EEF6FC;border-radius:12px;padding:12px 14px;margin-bottom:18px;border:1px solid #D1EAF5">'+
-      '<div style="font-weight:600;font-size:14px;color:#0277BD;margin-bottom:6px">🔗 Google Apps Script URL</div>'+
-      '<div style="font-size:12px;color:#546E7A;margin-bottom:8px;line-height:1.6">填入後：費用共用同步、AI 助手啟用。<br>不填則使用本裝置本地資料（每人分開）。</div>'+
-      '<input class="inp" id="apiUrlInp" value="'+apiUrl.replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:14px;margin-bottom:8px">'+
-      '<button class="btn-p" style="width:100%;font-size:14px;margin-bottom:6px" onclick="const v=document.getElementById(\'apiUrlInp\').value.trim();ST.apiUrl=v;ls(\'t26_api\',v);loadAll()">套用並同步 ✓</button>'+
+    '<div style="background:#F5F0E8;border-radius:12px;padding:12px 14px;margin-bottom:18px;border:1px solid #E0D8CC">'+
+      '<div style="font-weight:600;font-size:16px;color:#B8826A;margin-bottom:6px">🔗 Google Apps Script URL</div>'+
+      '<div style="font-size:16px;color:#7A6A5A;margin-bottom:8px;line-height:1.6">填入後：費用共用同步、AI 助手啟用。<br>不填則使用本裝置本地資料（每人分開）。</div>'+
+      '<input class="inp" id="apiUrlInp" value="'+apiUrl.replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:16px;margin-bottom:8px">'+
+      '<button class="btn-p" style="width:100%;font-size:16px;margin-bottom:6px" onclick="const v=document.getElementById(\'apiUrlInp\').value.trim();ST.apiUrl=v;ls(\'t26_api\',v);loadAll()">套用並同步 ✓</button>'+
       (apiUrl
-        ? '<div style="font-size:11px;color:#2E7D32">✅ 已設定：'+apiUrl.substring(0,55)+'…</div>'
-        : '<div style="font-size:11px;color:#90A4AE">尚未設定（使用本地模式）</div>')+
+        ? '<div style="font-size:16px;color:#2E7D32">✅ 已設定：'+apiUrl.substring(0,55)+'…</div>'
+        : '<div style="font-size:16px;color:#B8A890">尚未設定（使用本地模式）</div>')+
     '</div>'+
-    '<div style="font-weight:600;font-size:14px;color:#546E7A;margin-bottom:12px">💱 匯率設定</div>'+
+    '<div style="font-weight:600;font-size:16px;color:#7A6A5A;margin-bottom:12px">💱 匯率設定</div>'+
     '<div style="display:flex;flex-direction:column;gap:12px">'+
       [['JPY','日圓','¥',r.JPY],['KRW','韓圓','₩',r.KRW]].map(([k,l,sy,v])=>
         '<div>'+
-          '<div style="font-size:13px;font-weight:600;color:#546E7A;margin-bottom:6px">1 '+sy+'（'+l+'）＝ ? 台幣</div>'+
+          '<div style="font-size:16px;font-weight:600;color:#7A6A5A;margin-bottom:6px">1 '+sy+'（'+l+'）＝ ? 台幣</div>'+
           '<input class="inp" type="text" inputmode="decimal" id="rate_'+k+'" value="'+v+'" style="font-size:18px">'+
-          '<div style="font-size:11px;color:#90A4AE;margin-top:3px">目前：1 '+sy+' ≈ NT$ '+v+'</div>'+
+          '<div style="font-size:16px;color:#B8A890;margin-top:3px">目前：1 '+sy+' ≈ NT$ '+v+'</div>'+
         '</div>'
       ).join('')+
       '<button class="btn-p" onclick="'+
