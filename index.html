@@ -1,311 +1,776 @@
+const DEPLOY_API_URL = 'https://script.google.com/macros/s/1JFH9FxuFkWzDRMpRhF6EMSsCF3S98k-zMpfjKW0mfOKiBNoulsGiq0tH/exec';
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>☀️ 2026 家族盛夏大冒險 App</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="theme-color" content="#0277BD">
+<title>2026 釜山九州旅行</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <style>
-  body { font-family: 'PingFang TC', -apple-system, sans-serif; background-color: #f0f6fc; touch-action: manipulation; }
-  .touch-target { min-height: 48px; }
-  .word-wrap { word-break: break-word; overflow-wrap: break-word; }
-  ::-webkit-scrollbar { width: 0; height: 0; }
-  .leaflet-popup-content-wrapper { border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#EEF6FC;color:#1A2E3B;-webkit-font-smoothing:antialiased}
+input,textarea,select,button{font-family:inherit}
+::-webkit-scrollbar{width:0;height:0}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.header{flex-shrink:0;background:linear-gradient(135deg,#01579B,#0288D1,#00ACC1);color:#fff;padding:12px 16px 10px;position:relative}
+.header h1{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;line-height:1.3}
+.header .sub{font-size:11px;opacity:.75;margin-top:2px}
+.header .cntdown{position:absolute;right:16px;top:12px;text-align:right}
+.header .num{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;line-height:1}
+.header .lbl{font-size:10px;opacity:.7}
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.main.map-active{overflow:hidden}
+.nav{flex-shrink:0;display:flex;background:#fff;border-top:1px solid #E1EEF6;padding-bottom:env(safe-area-inset-bottom)}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;border:none;background:none;cursor:pointer;color:#90A4AE;font-size:10px;font-family:'DM Sans',sans-serif;min-height:52px}
+.nav button.act{color:#0277BD;font-weight:600}
+.nav button .ic{font-size:22px;line-height:1}
+.card{background:#fff;border-radius:14px;border:1px solid #E1EEF6;overflow:hidden;margin-bottom:10px}
+.card-top{height:3px}
+.card-body{padding:12px 14px}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+.btn-p{background:#0277BD;color:#fff;border:none;border-radius:22px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;display:inline-flex;align-items:center;gap:5px}
+.btn-g{background:none;border:1.5px solid #D1EAF5;border-radius:22px;padding:9px 16px;font-size:14px;color:#0277BD;cursor:pointer;font-family:inherit;min-height:44px}
+.inp{border:1.5px solid #D1EAF5;border-radius:10px;padding:10px 13px;font-size:16px;font-family:inherit;background:#F8FFFE;width:100%;outline:none;color:#1A2E3B;-webkit-appearance:none}
+.inp:focus{border-color:#0288D1;outline:none}
+.tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block}
+.section{padding:14px 16px}
+.dayrow{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
+.daypill{flex-shrink:0;min-width:56px;padding:7px 6px;border-radius:12px;border:2px solid transparent;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;border-width:2px}
+.spot{background:#fff;border-radius:12px;border:1px solid #E1EEF6;padding:12px 13px;margin-bottom:8px}
+.spot-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.mpill{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:4px;min-height:36px}
+.chat-wrap{display:flex;flex-direction:column;height:calc(100dvh - 130px)}
+.chat-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bubble{padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5;max-width:85%;word-break:break-word}
+.bubble.u{background:#0277BD;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.bubble.a{background:#fff;border:1px solid #E1EEF6;color:#1A2E3B;border-bottom-left-radius:4px;align-self:flex-start}
+.typing{display:flex;gap:4px;padding:12px 14px;background:#fff;border-radius:14px;border:1px solid #E1EEF6;align-self:flex-start}
+.typing span{width:7px;height:7px;background:#90A4AE;border-radius:50%;animation:bounce .9s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.modal-bg{position:fixed;inset:0;background:rgba(1,87,155,.3);display:flex;align-items:flex-end;justify-content:center;z-index:999;backdrop-filter:blur(2px)}
+.sync{position:fixed;top:0;left:50%;transform:translateX(-50%);background:#01579B;color:#fff;font-size:12px;padding:6px 16px;border-radius:0 0 10px 10px;z-index:9999;transition:opacity .3s}
+.sync.hide{opacity:0;pointer-events:none}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;padding-bottom:calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto}
 </style>
 </head>
-<body class="pb-24">
-<div id="root"></div>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="cntdown"><div class="num" id="dLeft">…</div><div class="lbl" id="dLbl"></div></div>
+    <h1>🇰🇷 釜山九州 2026 🇯🇵</h1>
+    <div class="sub" id="subTitle">熊本慢活版 · 9人自駕 · 6/26–7/5</div>
+  </div>
+  <div class="main" id="mainEl"></div>
+  <nav class="nav">
+    <button class="act" data-t="map" onclick="go('map')"><span class="ic">🗺️</span>地圖</button>
+    <button data-t="itin" onclick="go('itin')"><span class="ic">📅</span>行程</button>
+    <button data-t="accom" onclick="go('accom')"><span class="ic">🏨</span>住宿</button>
+    <button data-t="expense" onclick="go('expense')"><span class="ic">🧾</span>記帳</button>
+    <button data-t="ai" onclick="go('ai')"><span class="ic">🤖</span>助手</button>
+    <button data-t="more" onclick="go('more')"><span class="ic">⋯</span>更多</button>
+  </nav>
+</div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const { useState, useEffect, useRef } = React;
+// ╔══════════════════════════════════════════════════╗
+// ║  🔧 填入你的 Google Apps Script 部署 URL        ║
+// ╚══════════════════════════════════════════════════╝
+const DEPLOY_API_URL = '';   // ← 貼在引號內
+const DEPLOY_ALBUM_URL = 'https://photos.app.goo.gl/w1aDwmtASJP9siVg7';
 
-// 🔗 您的 Google Sheets API 網址
-const API_URL = "https://script.google.com/macros/s/AKfycbyJt-yL4vyyycB5XA2fKhNq-_VGP9oNyCFTP7FMKKmqtsvkp_8GWr8Y0Oo0cc_GY1mO0g/exec";
+// ═══ COLOURS ═══
+const DC={1:"#C62828",2:"#BF360C",3:"#6A1B9A",4:"#1565C0",5:"#2E7D32",6:"#00695C",7:"#880E4F",8:"#006064",9:"#4527A0",10:"#01579B"};
+const DEM=["🇰🇷","🦀","⛴","🦌","🦁","🌋","🛶","🛍","🎨","✈️"];
+const DT=["抵達釜山/宵夜","海線滿貫/遊艇","醫美/南浦洞/登船","博多取車/由布院","動物園/黒川溫泉","阿蘇絕景/高千穗","晨間划船/熊本城","鳥栖血拼/福岡賞花","近郊採買/光影藝術","市區巡禮/滿載返台"];
+const DM2={1:"6/26五",2:"6/27六",3:"6/28日",4:"6/29一",5:"6/30二",6:"7/1三",7:"7/2四",8:"7/3五",9:"7/4六",10:"7/5日"};
 
-const DC = { 1: "#FF6B6B", 2: "#FF8E53", 3: "#FFD166", 4: "#06D6A0", 5: "#118AB2", 6: "#073B4C", 7: "#9D4EDD", 8: "#F15BB5", 9: "#00B4D8", 10: "#0077B6" };
-const DAY_TITLES = ["抵達釜山/宵夜", "海線滿貫/遊艇", "醫美/南浦洞/登船", "博多取車/由布院", "動物園/黒川溫泉", "阿蘇絕景/高千穗", "晨間划船/熊本城", "鳥栖血拼/福岡賞花", "近郊採買/光影藝術", "市區巡禮/滿載返台"];
-
-const HOTELS = {
-  h_encore: { zh: "樂達安可 海雲台飯店", addr: "부산광역시 해운대구 구南로 9", cost: "NT$19,986（D1-D2，三房）", note: "海灘步行3分！大創隔壁，含自助早餐，近伍班長，全家搭乘 Uber 前往。", url: "https://tw.trip.com/hotels/ctorderdetail?orderid=1359044548641978&from=book&resultStatus=1&orderId=1359044548641978&billNo=3784034200784060" },
-  h_ferry: { zh: "新山茶花號（過夜渡輪）", addr: "釜山港 國際客運碼頭→博多港", cost: "NT$25,586（9人合計，一等日式×2）", note: "⚠️ 20:00出港！19:00開始出境，18:30前到港。可帶炸雞比薩上船！", url: "https://www.camellia-line.co.jp/rs/idv/member/nomember_post" },
-  h_grandbase: { zh: "GrandBase 別府 LOLANI", addr: "大分県別府市（鉄輪エリア）", cost: "NT$4,508（D4，二房）", note: "⚠️ 可和阿傑可樂碰面！確認9人容量 + 大型廂型車停車", url: "https://secure.booking.com/confirmation.zh-tw.html?label=metagha-link-LUTW-hotel-5678232_dev-desktop_los-1_bw-46_dow-Tuesday_defdate-0_room-0_gstadt-6_rateid-public_aud-9183043383_gacid-21404718441_mcid-50_bc-AFakmA_ppa-0_clrid-0_ad-1_gstkid-0_checkin-20260630_ppt-B_lp-2158_r-5704953346207779374&sid=a555bef49366ad92668334900a235d72&utm_source=metagha&utm_medium=localuniversal&utm_term=hotel-5678232&utm_content=dev-desktop_los-1_bw-46_dow-Tuesday_defdate-0_room-0_gstadt-6_rateid-public_aud-9183043383_gacid-21404718441_mcid-50_bc-AFakmA_ppa-0_clrid-0_ad-1_gstkid-0_checkin-20260630_ppt-B&utm_campaign=TW&gclid=CjwKCAjw5ZXQBhBdEiwAI5XVWXCM-3XaKkEkvp9KG1UIWgNDFBShAsYnRkpARKDNFkRWOVMN4doaqBoCLuUQAvD_BwE&aid=1288258&auth_key=JMCf5DtEbiRPwZFk&source=mytrips" },
-  h_kamenoi: { zh: "龜之井阿蘇 KAMENOI HOTEL", addr: "熊本県阿蘇郡南小国町", cost: "NT$20,969（D5，二房含早+晚）", note: "一泊二食！大草原遊戲室+溫泉。二房含早晚餐。次日Safari前出發。", url: "https://secure.booking.com/confirmation.zh-tw.html?aid=1288258&label=metagha-link-LUTW-hotel-5678232_dev-desktop_los-1_bw-46_dow-Tuesday_defdate-0_room-0_gstadt-6_rateid-public_aud-9183043383_gacid-21404718441_mcid-50_bc-AFakmA_ppa-0_clrid-0_ad-1_gstkid-0_checkin-20260630_ppt-B_lp-2158_r-5704953346207779374&sid=72aee69d682c0e037cf07b9faf1071c9&bp_travel_purpose=leisure&hostname=www.booking.com&is_bsd_shown=1&pfi=10106265767214&pre_pbb_price=115344&pre_price=113994&rt_num_blocks=59&send_sms_confirmation=1&source=conf_brief&srpvid=4f3b7b46b04b00f1&ua_created=0&bn=6265767214" },
-  h_yukigumo: { zh: "尤吉古莫 B&B 高千穗", addr: "宮崎県西臼杵郡高千穂町", cost: "NT$8,003（D6，三房含早）", note: "和式BNB！含早餐，步行可到高千穗神社 → 20:00 觀光神楽🎭", url: "https://secure.booking.com/confirmation.zh-tw.html?label=metagha-link-LUTW-hotel-5678232_dev-desktop_los-1_bw-46_dow-Tuesday_defdate-0_room-0_gstadt-6_rateid-public_aud-9183043383_gacid-21404718441_mcid-50_bc-AFakmA_ppa-0_clrid-0_ad-1_gstkid-0_checkin-20260630_ppt-B_lp-2158_r-5704953346207779374&sid=a555bef49366ad92668334900a235d72&utm_source=metagha&utm_medium=localuniversal&utm_term=hotel-5678232&utm_content=dev-desktop_los-1_bw-46_dow-Tuesday_defdate-0_room-0_gstadt-6_rateid-public_aud-9183043383_gacid-21404718441_mcid-50_bc-AFakmA_ppa-0_clrid-0_ad-1_gstkid-0_checkin-20260630_ppt-B&utm_campaign=TW&gclid=CjwKCAjw5ZXQBhBdEiwAI5XVWXCM-3XaKkEkvp9KG1UIWgNDFBShAsYnRkpARKDNFkRWOVMN4doaqBoCLuUQAvD_BwE&aid=1288258&auth_key=gc10FgdZWQwYQDAX&source=mytrips" },
-  h_ref: { zh: "REF Kumamoto by VESSEL HOTELS", addr: "熊本県熊本市中央区（上下通エリア）", cost: "NT$9,914（D7，三房含早）", note: "早餐強大好吃！近新市通，步行可到勝烈亭豬排、黑亭拉麵、商場。", url: "https://secure.booking.com/confirmation.zh-tw.html?aid=2419964&label=metagha-link-LUTW-hotel-5569795_dev-desktop_los-1_bw-48_dow-Thursday_defdate-0_room-0_gstadt-2_rateid-tw_aud-9183043383_gacid-21415139023_mcid-50_bc-AFT9Aw_ppa-1_clrid-0_ad-1_gstkid-0_checkin-20260702_ppt-GB_lp-2158_r-11301119025289711876&sid=72aee69d682c0e037cf07b9faf1071c9&bp_travel_purpose=leisure&hostname=www.booking.com&is_bsd_shown=1&pfi=10266265703979&pre_pbb_price=54720&pre_price=54720&rt_num_blocks=16&send_sms_confirmation=1&source=conf_brief&srpvid=15c5803a9f2b051d&ua_created=0&bn=6265703979" },
-  h_vessel: { zh: "福岡貝塚船舶酒店", addr: "〒812-0053 福岡県福岡市東区箱崎7-10-65", cost: "NT$8,519（D8，三房含早）", note: "大停車場（WD Class OK）。近筥崎宮あじさい苑步行圈。", url: "https://secure.booking.com/confirmation.zh-tw.html?aid=2419964&label=metagha-link-LUTW-hotel-5569795_dev-desktop_los-1_bw-48_dow-Thursday_defdate-0_room-0_gstadt-2_rateid-tw_aud-9183043383_gacid-21415139023_mcid-50_bc-AFT9Aw_ppa-1_clrid-0_ad-1_gstkid-0_checkin-20260702_ppt-GB_lp-2158_r-11301119025289711876&sid=72aee69d682c0e037cf07b9faf1071c9&bp_travel_purpose=leisure&hostname=www.booking.com&is_bsd_shown=1&pfi=10345216680169&pre_pbb_price=47026&pre_price=47025&rt_num_blocks=26&send_sms_confirmation=1&source=conf_brief&ua_created=0&bn=5216680169" },
-  h_lamp: { zh: "[LAMP] Airbnb Sweet Home（福岡）", addr: "福岡市内", cost: "NT$8,789（D9，一戶五床9人）", note: "整棟包棟9人！確認碼 HMNW55ZM8S。⚠️ 6/27後不退款！", url: "https://www.airbnb.com.tw/trips/v1/reservation-details/ro/RESERVATION2_CHECKIN/HMNW55ZM8S" }
+// ═══ HOTELS ═══
+const HOTELS={
+  h_encore:{zh:"Ramada Encore 海雲台",addr:"부산광역시 해운대구 구남로 9",phone:"+82-51-610-3000",ci:"15:00",co:"11:00",cost:"NT$19,986（三房）",note:"海灘步行3分！含自助早餐。大創隔壁。",day:"D1-D2"},
+  h_ferry:{zh:"新山茶花號（渡輪）",addr:"釜山港→博多港",phone:"+82-51-999-3000",ref:"予約番号 5086524",cost:"NT$25,586（9人，一等日式）",note:"⚠️18:30前到港！20:00出港。可帶炸雞上船！",day:"D3"},
+  h_grandbase:{zh:"GrandBase 別府 LOLANI",addr:"大分県別府市（鉄輪エリア）",ci:"15:00",co:"10:00",cost:"NT$4,508（二房）",note:"🤝 阿傑可樂今晚碰面！整棟villa。",day:"D4"},
+  h_kamenoi:{zh:"龜之井阿蘇 KAMENOI",addr:"熊本県南小国町（黒川温泉）",phone:"0967-44-XXXX",ci:"15:00",co:"11:00",cost:"NT$20,969（二房含早+晚）",note:"一泊二食！大草原遊戲室＋私人溫泉。",day:"D5"},
+  h_yukigumo:{zh:"尤吉古莫 B&B 高千穗",addr:"宮崎県西臼杵郡高千穂町",ci:"16:00",co:"10:00",cost:"NT$8,003（三房含早）",note:"和式BNB！步行→神楱🎭 20:00觀光神楱",day:"D6"},
+  h_ref:{zh:"REF Kumamoto by VESSEL",addr:"熊本市中央区（上下通）",ci:"15:00",co:"11:00",cost:"NT$9,914（含早）",note:"早餐好吃！近上下通，步行到勝烈亭。",day:"D7"},
+  h_vessel:{zh:"福岡貝塚船舶酒店",addr:"福岡市東区箱崎7-10-65",phone:"092-641-1234",ci:"14:00",co:"11:00",cost:"NT$8,519（三房含早）",note:"大停車場！含早餐。筥崎宮步行圈。",day:"D8"},
+  h_lamp:{zh:"[LAMP] Airbnb Sweet Home",addr:"福岡市内（近天神）",ref:"確認碼 HMNW55ZM8S",cost:"NT$8,789（整棟）",note:"⚠️6/27後不退款！週六高CP。",day:"D9"},
+};
+const BOOKING={
+  h_encore:"https://tw.trip.com/hotels/ctorderdetail?orderid=1359044548641978&from=book&resultStatus=1",
+  h_ferry:"https://www.camellia-line.co.jp/rs/idv/member/nomember_post",
+  h_grandbase:"https://secure.booking.com/confirmation.zh-tw.html?aid=1288258&auth_key=JMCf5DtEbiRPwZFk&source=mytrips",
+  h_kamenoi:"https://secure.booking.com/confirmation.zh-tw.html?aid=1288258&pfi=10106265767214&bn=6265767214",
+  h_yukigumo:"https://secure.booking.com/confirmation.zh-tw.html?aid=1288258&auth_key=gc10FgdZWQwYQDAX&source=mytrips",
+  h_ref:"https://secure.booking.com/confirmation.zh-tw.html?aid=2419964&pfi=10266265703979&bn=6265703979",
+  h_vessel:"https://secure.booking.com/confirmation.zh-tw.html?aid=2419964&pfi=10345216680169&bn=5216680169",
+  h_lamp:"https://www.airbnb.com.tw/trips/v1/reservation-details/ro/RESERVATION2_CHECKIN/HMNW55ZM8S",
 };
 
-const SPOT_DATA = {
-  1: [
-    { name: "✈️ 出發：桃園機場 T1", lat: 25.0797, lng: 121.2342, note: "15:45 CI-0186 起飛！提前2小時集合" },
-    { name: "🛬 金海機場 抵達", lat: 35.1772, lng: 128.9385, note: "19:00 抵達（韓國+9），全家改搭 Uber 前往海雲台" },
-    { name: "🍲 嚴湧帛 豬肉湯飯（宵夜）", lat: 35.1645, lng: 129.1650, note: "超夯熱門美食！淡麗清湯" },
-    { name: "🏨 Ramada Encore 海雲台（入住）", lat: 35.1578, lng: 129.1619, note: "大創隔壁，海灘散步3分鐘" }
+// ═══ SPOTS ═══
+function g(q){return"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);}
+function n(q){return"https://map.naver.com/p/search/"+encodeURIComponent(q);}
+const SPOTS={
+1:[
+  {t:"F",nm:"✈️ 桃園機場 T1 出發",lat:25.0797,lng:121.2342,gmap:g("桃園國際機場"),note:"15:45 CI-0186！提前2小時"},
+  {t:"s",nm:"🛬 金海機場 抵達",lat:35.1772,lng:128.9385,naver:n("김해국제공항"),gmap:g("Gimhae International Airport"),note:"19:00 抵達"},
+  {t:"s",nm:"🍲 嚴湧帛 豬肉湯飯（宵夜）",lat:35.1645,lng:129.1650,naver:n("엄용백돼지국밥해운대점"),hours:"07:00–22:00",price:"₩11,000起"},
+  {t:"T",hk:"h_encore",nm:"🏨 Ramada Encore 海雲台（入住）",lat:35.1578,lng:129.1619,phone:"+82-51-610-3000"},
+],
+2:[
+  {t:"FT",hk:"h_encore",nm:"🏨 Ramada Encore（連住）",lat:35.1578,lng:129.1619},
+  {t:"s",nm:"🍳 Egg Drop 蛋蛋吐司（早餐）",lat:35.162,lng:129.158,naver:n("에그드랍해운대"),hours:"08:00–22:00",price:"₩5,500起"},
+  {t:"s",nm:"⛩ 海東龍宮寺 🎫釜山Pass",lat:35.1884,lng:129.2232,naver:n("해동용궁사"),hours:"04:30–19:20",price:"免費（Pass適用）"},
+  {t:"s",nm:"🦀 機張市場 松葉蟹（午餐）",lat:35.2443,lng:129.2227,naver:n("기장시장"),hours:"06:00–21:00",price:"₩30,000起"},
+  {t:"s",nm:"🛍 東釜山 Premium Outlet",lat:35.178,lng:129.204,naver:n("동부산아울렛"),hours:"10:30–21:30"},
+  {t:"s",nm:"🚞 해운대 블루라인파크（海岸列車）🎫Pass",lat:35.16,lng:129.165,naver:n("해운대블루라인파크"),hours:"09:00–21:00",price:"₩10,000起"},
+  {t:"s",nm:"🥘 巨松燉排骨（提早晚餐）",lat:35.1577,lng:129.1624,naver:n("거송갈비찜해운대")},
+  {t:"s",nm:"🥨 自然島 鹽可頌",lat:35.161,lng:129.16,naver:n("자연도소금빵해운대"),price:"₩12,000/4入"},
+  {t:"s",nm:"🚁 廣安大橋 無人機表演",lat:35.1533,lng:129.1186,note:"遊艇改→無人機表演！"},
+  {t:"s",nm:"♨ Club D Oasis 汗蒸幕",lat:35.1594,lng:129.167,naver:n("클럽디오아시스"),price:"₩15,000"},
+  {t:"s",nm:"🥩 伍班長 韓牛烤肉（宵夜）",lat:35.1531,lng:129.1186,naver:n("오반장"),hours:"11:00–06:00"},
+],
+3:[
+  {t:"F",hk:"h_encore",nm:"🏨 Encore 退房",lat:35.1578,lng:129.1619},
+  {t:"s",nm:"🍲 水邊最高 豬肉湯飯（早午餐）",lat:35.102,lng:129.0265,naver:n("수변최고돼지국밥"),hours:"08:00–20:00",price:"₩10,000起"},
+  {t:"s",nm:"💆 醫美/太宗台/松島纜車（三選一）",lat:35.0515,lng:128.9888,gmap:g("태종대"),note:"醫美 或 太宗台 或 松島纜車"},
+  {t:"s",nm:"🛍 南浦洞 & 富平市場（配眼鏡）",lat:35.1017,lng:129.0264,naver:n("부평깡통시장"),note:"十元餅！配眼鏡"},
+  {t:"s",nm:"🗼 釜山塔 🎫釜山Pass免費",lat:35.1006,lng:129.0326,naver:n("부산타워"),hours:"10:00–22:00",price:"₩12,000→🎫Pass免費"},
+  {t:"s",nm:"🥩 烤肉的男子 남포（晚餐）＋炸雞上船",lat:35.1008,lng:129.028,naver:n("고기집남자남포점"),note:"記得買炸雞比薩上船！"},
+  {t:"T",hk:"h_ferry",nm:"⛴ 釜山港 登船 新山茶花號",lat:35.0991,lng:129.0382,note:"⚠️18:30前到！20:00出港"},
+],
+4:[
+  {t:"F",nm:"🚐 博多港 FunFun取車 08:30",lat:33.5897,lng:130.4207,gmap:g("博多港国際ターミナル"),note:"r38002431 / Caravan高頂 / 博多港取車"},
+  {t:"s",nm:"🦌 由布院 金鱗湖 & B-Speak",lat:33.2662,lng:131.3687,gmap:g("由布院金鱗湖"),hours:"B-Speak 10:00–17:00",price:"P-roll¥2,200",mc:"269 501 716"},
+  {t:"s",nm:"♨ 地獄蒸工房 鉄輪（⚠️木曜休）",lat:33.3084,lng:131.4858,gmap:g("地獄蒸し工房鉄輪"),hours:"10:00–19:00（木曜休）",mc:"46 522 355"},
+  {t:"s",nm:"♨ 別府 海地獄",lat:33.3159,lng:131.4697,gmap:g("別府地獄めぐり"),hours:"08:00–17:00",price:"¥2,400套票",mc:"269 178 150"},
+  {t:"s",nm:"♨ 別府 海濱砂湯",lat:33.2924,lng:131.501,gmap:g("別府海浜砂湯"),hours:"08:30–17:00",price:"¥1,500",mc:"46 524 353"},
+  {t:"T",hk:"h_grandbase",nm:"🏠 GrandBase 別府（入住）🤝阿傑可樂",lat:33.302,lng:131.48,gmap:g("グランドベース別府")},
+],
+5:[
+  {t:"F",hk:"h_grandbase",nm:"🏠 GrandBase 出發",lat:33.302,lng:131.48,note:"8:00出發→Safari排隊"},
+  {t:"s",nm:"🦁 九州アフリカンサファリ（叢林巴士！）🎫FunPass",lat:33.3364,lng:131.3934,gmap:g("九州自然動物公園アフリカンサファリ"),hours:"09:00–17:00",price:"¥2,600 / 🎫FunPass確認",note:"⚠️8:00排隊買叢林巴士票！",mc:"46 715 074"},
+  {t:"s",nm:"🍮 麓(Roku) 泡芙（黒川）",lat:33.082,lng:131.1415,gmap:g("パティスリー麓黒川"),hours:"09:00–17:00",price:"¥450"},
+  {t:"s",nm:"♨ 黒川温泉 溫泉街散策",lat:33.0815,lng:131.1418,gmap:g("黒川温泉"),note:"入湯手形¥1,500→泡3間！",mc:"440 388 717"},
+  {t:"T",hk:"h_kamenoi",nm:"♨ KAMENOI HOTEL 黒川（入住）",lat:33.0815,lng:131.1418,gmap:g("亀の井ホテル黒川温泉")},
+],
+6:[
+  {t:"F",hk:"h_kamenoi",nm:"♨ KAMENOI 早餐後出發",lat:33.0815,lng:131.1418},
+  {t:"s",nm:"🌋 大觀峰 展望台",lat:33.023,lng:131.087,gmap:g("大観峰阿蘇"),price:"免費",mc:"256 505 245"},
+  {t:"s",nm:"🌋 草千里ヶ浜（阿蘇）",lat:32.8818,lng:131.0533,gmap:g("草千里ヶ浜"),price:"騎馬¥1,200",mc:"256 063 250"},
+  {t:"s",nm:"🍖 阿蘇 赤牛丼（午餐）",lat:32.875,lng:131.06,gmap:g("阿蘇赤牛丼"),price:"¥1,800起"},
+  {t:"s",nm:"⛩ 上色見熊野座神社",lat:32.8212,lng:131.1524,gmap:g("上色見熊野座神社"),mc:"276 022 372"},
+  {t:"s",nm:"🍜 千穗之家 流水麵",lat:32.71,lng:131.31,gmap:g("千穂の家高千穂"),hours:"11:00–15:00",price:"¥1,100"},
+  {t:"s",nm:"🏞 高千穗峽 遊船（下午）",lat:32.7019,lng:131.3046,gmap:g("高千穂峡ボート"),hours:"08:30–16:30",price:"¥2,000/30min",mc:"330 711 73"},
+  {t:"T",hk:"h_yukigumo",nm:"🏠 尤吉古莫 B&B（入住）→神楱🎭",lat:32.71,lng:131.305,gmap:g("高千穂BNB")},
+],
+7:[
+  {t:"F",hk:"h_yukigumo",nm:"🏠 尤吉古莫 早餐後出發",lat:32.71,lng:131.305},
+  {t:"s",nm:"🛶 高千穗峽 晨間划船【09:30已預訂！】",lat:32.7019,lng:131.3046,gmap:g("高千穂峡ボート"),hours:"09:30（提前30分報到）",price:"¥2,000/30min",note:"⭐已預訂！早晨無人！",mc:"330 711 73"},
+  {t:"s",nm:"🍱 勝烈亭 豬排（午餐）",lat:32.8032,lng:130.7078,gmap:g("勝烈亭熊本"),hours:"11:30–21:00",price:"¥1,500",mc:"29 459 385"},
+  {t:"s",nm:"🏯 熊本城 + 和服體驗 🎫FunPass",lat:32.8062,lng:130.7058,gmap:g("熊本城"),hours:"09:00–17:00",price:"¥800 / 🎫Pass確認",mc:"29 411 130"},
+  {t:"s",nm:"🏘 桜之馬場 城彩苑",lat:32.8075,lng:130.7065,gmap:g("桜の馬場城彩苑"),note:"くまモン！"},
+  {t:"s",nm:"🛍 上下通商店街",lat:32.8,lng:130.707,gmap:g("上通下通商店街熊本"),hours:"10:00–21:00"},
+  {t:"T",hk:"h_ref",nm:"🏨 REF Kumamoto by VESSEL（入住）",lat:32.8,lng:130.7065,gmap:g("REF Kumamoto VESSEL")},
+],
+8:[
+  {t:"F",hk:"h_ref",nm:"🏨 REF 熊本 早餐後北上",lat:32.8,lng:130.7065},
+  {t:"s",nm:"🛍 鳥栖 Premium Outlets",lat:33.378,lng:130.492,gmap:g("鳥栖プレミアムアウトレット"),hours:"10:00–20:00",note:"美食廣場午餐"},
+  {t:"s",nm:"🎐 如意輪寺 風鈴祭（久留米）",lat:33.319,lng:130.516,gmap:g("如意輪寺風鈴祭"),note:"7月見頃！數千個風鈴"},
+  {t:"s",nm:"🌸 筥崎宮 紫陽花苑",lat:33.6424,lng:130.4192,gmap:g("筥崎宮紫陽花苑"),hours:"09:00–18:00",price:"¥500"},
+  {t:"s",nm:"🍜 Shin-Shin 拉麵（晚餐）",lat:33.5904,lng:130.399,gmap:g("博多らーめんShinShin天神"),price:"¥900"},
+  {t:"T",hk:"h_vessel",nm:"🏨 福岡貝塚船舶酒店（入住）",lat:33.6352,lng:130.4241,gmap:g("Vessel Hotel Fukuoka Kaizuka")},
+],
+9:[
+  {t:"F",hk:"h_vessel",nm:"🏨 Vessel 福岡 早餐後退房",lat:33.6352,lng:130.4241},
+  {t:"s",nm:"⛩ 太宰府天滿宮 紫陽花花手水🌸",lat:33.5212,lng:130.5348,gmap:g("太宰府天満宮"),hours:"06:00–19:00",price:"免費",mc:"55 364 011"},
+  {t:"s",nm:"🍜 一蘭 太宰府 五角碗＋🐱BEAMS招財貓",lat:33.52,lng:130.534,gmap:g("一蘭太宰府"),price:"¥980",note:"太宰府限定！"},
+  {t:"s",nm:"⛩ Workman Plus 近郊",lat:33.63,lng:130.45,gmap:g("Workman Plus 福岡"),hours:"08:00–20:00"},
+  {t:"s",nm:"🛒 Costco 久山（可pass）",lat:33.6177,lng:130.5177,gmap:g("コストコ久山"),hours:"10:00–20:00",mc:"13 543 454"},
+  {t:"s",nm:"👔 2nd STREET 箱崎店",lat:33.64,lng:130.42,gmap:g("2nd Street 箱崎 福岡"),hours:"11:00–20:00"},
+  {t:"s",nm:"🎨 teamLab 森林 福岡 🎫FunPass",lat:33.593,lng:130.364,gmap:g("チームラボフォレスト福岡"),hours:"10:00–20:00（需預約！）",price:"¥2,400 / 🎫Pass確認",mc:"13 496 355"},
+  {t:"s",nm:"🥩 中洲 和牛燒肉 吃到飽（晚餐）",lat:33.591,lng:130.409,gmap:g("中洲和牛焼肉食べ放題"),hours:"17:00–23:00"},
+  {t:"T",hk:"h_lamp",nm:"🏠 [LAMP] Airbnb（入住）",lat:33.5904,lng:130.4017,note:"確認碼 HMNW55ZM8S"},
+],
+10:[
+  {t:"F",hk:"h_lamp",nm:"🏠 [LAMP] 退房",lat:33.5904,lng:130.4017},
+  {t:"s",nm:"🛍 天神商圈 / 地下街（最後採購）",lat:33.5908,lng:130.3989,gmap:g("天神地下街福岡"),hours:"10:00–20:00"},
+  {t:"s",nm:"🍰 Qu'il fait bon 水果塔",lat:33.591,lng:130.398,gmap:g("Quilfaitbon天神福岡"),price:"¥1,200–2,500"},
+  {t:"s",nm:"💊 猛健樂 診所",lat:33.5908,lng:130.3985,gmap:g("猛健樂福岡天神")},
+  {t:"T",nm:"✈️ FunFun還車→福岡機場 返台",lat:33.5859,lng:130.4435,gmap:g("福岡空港国際線"),note:"⚠️18:00還車！21:00 CI-0117"},
+],
+};
+const MEALS=[
+  {d:1,m:"機場自理",l:"機上餐",dn:"嚴湧帛돼지국밥",s:"海雲台大街"},
+  {d:2,m:"Egg Drop蛋蛋吐司",l:"機張市場松葉蟹🦀",dn:"廣安大橋自理",s:"巨松排骨+鹽可頌+伍班長宵夜"},
+  {d:3,m:"水邊最高돼지국밥（早午餐）",l:"富平市場周邊",dn:"烤肉的男子+炸雞上船",s:"十元餅"},
+  {d:4,m:"便利商店",l:"由布院自理（B-Speak！）",dn:"別府居酒屋🤝阿傑",s:"地獄蒸布丁"},
+  {d:5,m:"GrandBase自理",l:"Safari動物園",dn:"KAMENOI懷石（含）",s:"麓(Roku)泡芙🍮"},
+  {d:6,m:"龜之井自助餐（含）",l:"阿蘇赤牛丼🐄",dn:"高千穗周邊（高千穗牛）",s:"千穗之家流水麵🍜"},
+  {d:7,m:"尤吉古莫B&B（含）",l:"勝烈亭豬排🍱",dn:"熊本市區（黑亭拉麵）",s:"城彩苑くまモン"},
+  {d:8,m:"REF Kumamoto（含）",l:"鳥栖Outlets美食廣場",dn:"Shin-Shin拉麵🍜",s:"如意輪寺風鈴+紫陽花"},
+  {d:9,m:"福岡Vessel（含）",l:"一蘭太宰府五角碗🍜",dn:"中洲和牛吃到飽🥩",s:"梅枝餅"},
+  {d:10,m:"自理",l:"天神百貨美食街",dn:"機場/機上餐",s:"Qu'il fait bon水果塔🍰"},
+];
+
+// ═══ STATE ═══
+const WHO_LIST=["共同","Claudia","Cony","Penny","張爸","張媽","多多","庭庭","膩膩","豆腐"];
+const DEF_BUDGET=[
+  {id:"flt",cat:"✈️ 機票",label:"CI-0186/CI-0117（9人）",total:100011,cur:"TWD",paid:true,ref:"PNR FMVW96"},
+  {id:"accom",cat:"🏨 住宿+渡輪",label:"全程9晚含渡輪",total:106274,cur:"TWD",paid:false,ref:""},
+  {id:"car",cat:"🚐 FunFun租車",label:"Caravan高頂（7天）",total:116600,cur:"JPY",paid:false,ref:"r38002431"},
+  {id:"etc",cat:"🛣 ETC高速",label:"九州全程估計",total:28000,cur:"JPY",paid:false,ref:""},
+];
+let ST={
+  tab:"map",mapDay:"all",itinDay:1,
+  exps:[],done:{},notes:{},extra:{},
+  rates:{JPY:0.222,KRW:0.0233},
+  aiHist:[],aiIn:"",aiLoad:false,
+  albumUrl:"",morePg:"menu",accomOpen:{},
+  addExp:false,editExpId:null,
+  expForm:{cat:"🍜 餐飲",label:"",amt:"",cur:"JPY",who:"共同",day:1},
+  paxEdit:null,paxDraft:{},
+  budgetItems:null,budgetEditId:null,budgetDraft:{},
+  apiUrl:"",syncing:false,
+  travelers:[
+    {id:1,zh:"張爸",en:"ZHANG XX",born:"1950",passport:"",phone:"",icon:"👴",role:"長青",kid:"adult"},
+    {id:2,zh:"張媽",en:"ZHANG XX",born:"1956",passport:"",phone:"",icon:"👵",role:"長青",kid:"adult"},
+    {id:3,zh:"Claudia 張芝瑞",en:"CHANG CHIH-JUI",born:"1984",passport:"",phone:"886-919839970",icon:"👩",role:"主辦",kid:"adult"},
+    {id:4,zh:"Cony",en:"",born:"1982",passport:"",phone:"",icon:"👨",role:"駕駛",kid:"adult"},
+    {id:5,zh:"Penny",en:"",born:"1982",passport:"",phone:"",icon:"👩",role:"壯年",kid:"adult"},
+    {id:6,zh:"多多",en:"",born:"2011",passport:"",phone:"",icon:"🧑",role:"國三",kid:"child"},
+    {id:7,zh:"庭庭",en:"",born:"2015",passport:"",phone:"",icon:"👧",role:"小五",kid:"child"},
+    {id:8,zh:"膩膩",en:"",born:"2017",passport:"",phone:"",icon:"🧒",role:"小三",kid:"child"},
+    {id:9,zh:"豆腐",en:"",born:"2021",passport:"",phone:"",icon:"🐣",role:"大班",kid:"infant"},
   ],
-  2: [
-    { name: "🍳 Egg Drop 吐司早餐", lat: 35.1620, lng: 129.1580 },
-    { name: "⛩ 海東龍宮寺", lat: 35.1884, lng: 129.2232, note: "海崖絕美寺廟！早去人潮少" },
-    { name: "🦀 機張市場 松葉蟹（午餐）", lat: 35.2443, lng: 129.2227, note: "現撈松葉蟹，加工工本費建議支付現金" },
-    { name: "🚞 海岸列車散步 (藍線公園)", lat: 35.1600, lng: 129.1650 },
-    { name: "🛍 東釜山 Premium Outlet", lat: 35.1780, lng: 129.2040 },
-    { name: "🥘 巨松燉排骨（提早晚餐）", lat: 35.1577, lng: 129.1624 },
-    { name: "🚁 廣安大橋 無人機表演（夜景）", lat: 35.1533, lng: 129.1186 },
-    { name: "🥩 伍班長 韓牛烤肉（宵夜）", lat: 35.1531, lng: 129.1186 }
-  ],
-  3: [
-    { name: "🍲 水邊最高 豬肉湯飯", lat: 35.1020, lng: 129.0265, note: "超高人氣早午餐選擇" },
-    { name: "💆 隱藏行程：釜山醫美 / 太宗台 / 松島纜車", lat: 35.0515, lng: 128.9888, note: "彈性分頭行動" },
-    { name: "🛍 南浦洞商圈 & 富平市場", lat: 35.1017, lng: 129.0264, note: "配眼鏡、買十元餅、外帶炸雞比薩登船" },
-    { name: "⛴ 釜山港 登船（新山茶花號）", lat: 35.0991, lng: 129.0382, note: "⚠️ 18:30前到港，20:00出港" }
-  ],
-  4: [
-    { name: " Vans 博多港 → funfun 取車", lat: 33.5897, lng: 130.4207, note: "10:00 專人接送博多港取車，改訂 funfun 租車" },
-    { name: "🦌 由布院 湯之坪街道 & 金鱗湖", lat: 33.2662, lng: 131.3687, note: "Mapcode: 269 501 716" },
-    { name: "♨ 別府 海地獄 & 砂湯", lat: 33.3159, lng: 131.4697 },
-    { name: "🏠 GrandBase 別府 LOLANI（入住）", lat: 33.3020, lng: 131.4800, note: "🤝 今晚與阿傑可樂在別府碰面居酒屋同樂！" }
-  ],
-  5: [
-    { name: "🦁 九州自然動物公園 Safari", lat: 33.3364, lng: 131.3934, note: "⚠️ 8:00前往排隊搶購叢林巴士車票！" },
-    { name: "♨ 黒川温泉 街區散策", lat: 33.0815, lng: 131.1418, note: "Mapcode: 440 388 717" },
-    { name: "♨ KAMENOI HOTEL 阿蘇（入住）", lat: 33.0815, lng: 131.1418, note: "一泊二食溫泉百匯，設有大草原遊戲室" }
-  ],
-  6: [
-    { name: "🌋 大觀峰 & 阿蘇草千里ヶ浜", lat: 33.0230, lng: 131.0870 },
-    { name: "⛩ 上色見熊野座神社", lat: 32.8212, lng: 131.1524, note: "108盞神秘石燈籠，庭庭必拍地點" },
-    { name: "🏠 尤吉古莫 B&B 高千穗（入住）", lat: 32.7100, lng: 131.3050, note: "晚間可走路前往高千穗神社觀賞 20:00 觀光神樂🎭" }
-  ],
-  7: [
-    { name: "🛶 高千穗峽 晨間劃船【09:30 已成功預訂】", lat: 32.7019, lng: 131.3046, note: "⭐ 早上人極少！請務必提早30分鐘到現場報到" },
-    { name: "🍜 千穗之家 流水麵（午餐）", lat: 32.7100, lng: 131.3100 },
-    { name: "🍱 勝烈亭 豬排 (熊本)", lat: 32.8032, lng: 130.7078 },
-    { name: "🏯 熊本城 & 桜之馬場 城彩苑", lat: 32.8062, lng: 130.7058 },
-    { name: "🏨 REF Kumamoto by VESSEL（入住）", lat: 32.8000, lng: 130.7065, note: "新市街旁，頂樓大浴場，早餐極度強大" }
-  ],
-  8: [
-    { name: "🎐 如意輪寺 風鈴祭（久留米）", lat: 33.3190, lng: 130.5160, note: "消暑限定！數千個清脆繽紛風鈴祭" },
-    { name: "🛍 鳥栖 Premium Outlets", lat: 33.3780, lng: 130.4920, note: "九州指標性美式免稅 Outlet" },
-    { name: "👔 2nd STREET 箱崎店", lat: 33.6400, lng: 130.4200, note: "回飯店順路踩點日本二手潮牌服飾" },
-    { name: "🌸 筥崎宮 紫陽花苑", lat: 33.6424, lng: 130.4192, note: "盛夏繡球花見頃，飯店步行圈即可抵達" },
-    { name: "🏨 福岡貝塚船舶酒店（入住）", lat: 33.6352, lng: 130.4241 }
-  ],
-  9: [
-    { name: "⛩ 太宰府天滿宮 紫陽花花手水 🌸", lat: 33.5212, lng: 130.5348 },
-    { name: "🍜 一蘭拉麵 太宰府限定五角合格碗", lat: 33.5200, lng: 130.5340 },
-    { name: "🎨 teamLab 森林 福岡", lat: 33.5930, lng: 130.3640, note: "⚠️ 線上預約制！光影藝術展" },
-    { name: "🥩 中洲 / 藥院 和牛燒肉 吃到飽（晚餐）", lat: 33.5910, lng: 130.4090, note: "全家最後一晚大餐（備案：藥院燒肉）" },
-    { name: "🏠 [LAMP] Airbnb Sweet Home（入住）", lat: 33.5904, lng: 130.4017 }
-  ],
-  10: [
-    { name: "💊 YOROSHII 猛健樂看診", lat: 33.5855, lng: 130.4015, note: "⚠️ 11:00已預約！藥院站步6分，現場看診現場取藥" },
-    { name: "🛍 天神商圈 / 地下街最後採購", lat: 33.5908, lng: 130.3989, note: "明太子伴手禮補貨（午餐：燒肉備案）" },
-    { name: "🍰 Qu'il fait bon 水果塔 天神", lat: 33.5910, lng: 130.3980 },
-    { name: "✈️ funfun還車 + 福岡機場國際線", lat: 33.5859, lng: 130.4435, note: "⚠️ 17:30前funfun還車，21:00 CI-0117 飛返台灣" }
-  ]
 };
 
-const MEALS = [
-  { morning: "機場自理", lunch: "機上餐", dinner: "嚴湧帛豬肉湯飯", snack: "海雲台大街散步" },
-  { morning: "Egg Drop 吐司🍳", lunch: "機張市場松葉蟹🦀", dinner: "廣安里周邊自理", snack: "巨松燉排骨 + 鹽可頌" },
-  { morning: "水邊最高湯飯🍲", lunch: "富平市場配眼鏡", dinner: "烤肉的男子+外帶夜船炸雞", snack: "十元餅" },
-  { morning: "博多便利店", lunch: "由布院自理", dinner: "別府居酒屋🍶(與阿傑碰面)", snack: "地獄蒸布丁" },
-  { morning: "自理", lunch: "Safari園區餐", dinner: "龜之井阿蘇溫泉百匯(含)", snack: "麓泡芙🍮" },
-  { morning: "龜之井早餐(含)", lunch: "阿蘇赤牛丼🐄", dinner: "高千穗牛平價餐館", snack: "流水麵🍜" },
-  { morning: "B&B日式早(含)", lunch: "勝烈亭豬排🍱", dinner: "熊本黑亭拉麵", snack: "城彩苑點心" },
-  { morning: "熊本Vessel(含)", lunch: "鳥栖Outlet美食街", dinner: "Shin-Shin博多拉麵", snack: "風鈴祭" },
-  { morning: "福岡Vessel(含)", lunch: "一蘭太宰府五角碗", dinner: "中洲/藥院和牛燒肉🥩", snack: "梅枝餅" },
-  { morning: "Airbnb自理", lunch: "天神百貨美食街/燒肉", dinner: "機場餐廳/機上餐", snack: "最後的水果塔🍰" }
-];
+// ═══ STORAGE + API ═══
+function sg(k,def=null){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}}
+function ls(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
-const TRAVELERS = [
-  { id: 1, zh: "張爸", icon: "👴" }, { id: 2, zh: "張媽", icon: "👵" },
-  { id: 3, zh: "CHIHJUI CHANG", icon: "👩" }, { id: 4, zh: "Cony", icon: "👨" },
-  { id: 5, zh: "Penny", icon: "👩" }, { id: 6, zh: "多多", icon: "🧑" },
-  { id: 7, zh: "庭庭", icon: "👧" }, { id: 8, zh: "膩膩", icon: "🧒" }, { id: 9, zh: "豆腐", icon: "🐣" }
-];
-
-function App() {
-  const w = useW();
-  const isMob = w < 1024, isDsk = w >= 1024;
-  const sz = { xxl: isDsk ? 28 : 24, xl: isDsk ? 22 : 20, lg: isDsk ? 18 : 17, md: isDsk ? 16 : 15, sm: 14, xs: 13 };
-  
-  const [tab, setTab] = useState("itin");
-  const [expenses, setExpenses] = useState([]);
-  const [rates] = useState({ JPY: 0.222, KRW: 0.0233 });
-
-  useEffect(() => {
-    fetch(`${API_URL}?sheet=Expenses`).then(res => res.json()).then(data => { if(Array.isArray(data)) setExpenses(data); }).catch(() => {});
-  }, [tab]);
-
-  const addExpenseToCloud = (newExp) => {
-    setExpenses([newExp, ...expenses]);
-    fetch(API_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sheet: "Expenses", ...newExp }) });
-  };
-
-  const NAVS = [
-    { id: "itin", icon: "📅", l: "行程" },
-    { id: "map", icon: "🗺️", l: "地圖" },
-    { id: "accom", icon: "🏨", l: "住宿憑證" },
-    { id: "expense", icon: "💰", l: "預算記帳" },
-    { id: "more", icon: "🧳", l: "工具" }
-  ];
-
-  return React.createElement("div", { class: `flex ${isDsk ? 'flex-row' : 'flex-col'} min-h-screen` },
-    isDsk && React.createElement("aside", { class: "w-64 bg-gradient-to-b from-blue-700 to-cyan-500 text-white p-6 space-y-6 flex-shrink-0" },
-      React.createElement("div", null, React.createElement("h1", { class: "text-2xl font-black" }, "☀️ 2026家族旅行"), React.createElement("p", { class: "text-xs opacity-75 mt-1" }, "9人家族盛夏度假版")),
-      React.createElement("nav", { class: "space-y-2" }, NAVS.map(n => React.createElement("button", { key: n.id, onClick: () => setTab(n.id), class: `w-full text-left p-3 rounded-xl flex items-center gap-3 font-bold ${tab === n.id ? 'bg-white text-blue-700 shadow' : 'hover:bg-white/10 text-white'}` }, React.createElement("span", null, n.icon), n.l)))
-    ),
-    React.createElement("div", { class: "flex-1 flex flex-col min-w-0" },
-      !isDsk && React.createElement("header", { class: "bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-5 pt-10 shadow-md flex-shrink-0 text-center" },
-        React.createElement("h1", { class: "text-xl font-bold" }, "☀️ 2026 釜山九州家族 App"),
-        React.createElement("p", { class: "text-xs opacity-90 mt-0.5" }, "盛夏明亮度假風 · 雲端版")
-      ),
-      React.createElement("main", { class: "flex-1 overflow-y-auto p-4" },
-        tab === "itin" && React.createElement(ItinLayout, { sz }),
-        tab === "map" && React.createElement(MapLayout),
-        tab === "accom" && React.createElement(AccomLayout),
-        tab === "expense" && React.createElement(ExpenseLayout, { expenses, onAdd: addExpenseToCloud, rates }),
-        tab === "more" && React.createElement(MoreLayout)
-      ),
-      !isDsk && React.createElement("nav", { class: "fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2 shadow-xl z-50 pb-safe" },
-        NAVS.map(n => React.createElement("button", { key: n.id, onClick: () => setTab(n.id), class: `flex-grow flex flex-col items-center justify-center touch-target ${tab === n.id ? 'text-blue-600 font-bold' : 'text-gray-400'}` }, React.createElement("span", { class: "text-xl" }, n.icon), React.createElement("span", { class: "text-[10px] mt-0.5" }, n.l)))
-      )
-    )
-  );
-}
-
-function ItinLayout({ sz }) {
-  const [day, setDay] = useState(1);
-  const spots = SPOT_DATA[day] || []; const meal = MEALS[day-1];
-  return React.createElement("div", { class: "space-y-4 max-w-3xl mx-auto" },
-    React.createElement("div", { class: "flex gap-2 overflow-x-auto pb-2" }, [1,2,3,4,5,6,7,8,9,10].map(d => React.createElement("button", { key: d, onClick: () => setDay(d), class: `flex-shrink-0 px-4 py-2 rounded-xl border text-sm font-bold ${day === d ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-blue-600 border-gray-200'}` }, `D${d}`))),
-    React.createElement("div", { class: "bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-2xl text-white shadow" }, React.createElement("h2", { class: "text-lg font-bold" }, `Day ${day} : ${DAY_TITLES[day-1]}`), React.createElement("div", { class: "grid grid-cols-2 gap-2 mt-3 text-xs opacity-95 bg-white/10 p-3 rounded-xl" }, React.createElement("div",null,`早: ${meal.morning}`), React.createElement("div",null,`午: ${meal.lunch}`), React.createElement("div",null,`晚: ${meal.dinner}`), React.createElement("div",null,`點: ${meal.snack}`))),
-    spots.map((s, i) => React.createElement("div", { key: i, class: "bg-white p-4 rounded-2xl shadow-xs border-l-4 flex gap-3", style:{ borderLeftColor: DC[day] } },
-      React.createElement("div", { class: "w-7 h-7 rounded-full text-white font-bold text-sm flex items-center justify-center flex-shrink-0 mt-0.5", style:{ background: DC[day] } }, i+1),
-      React.createElement("div", { class: "min-w-0 flex-1" },
-        React.createElement("h4", { class: "font-bold text-gray-800 text-base word-wrap" }, s.name),
-        s.note && React.createElement("p", { class: "text-xs text-gray-500 mt-1 bg-gray-50 p-2 rounded-lg word-wrap" }, s.note)
-      )
-    ))
-  );
-}
-
-function MapLayout() {
-  const mapRef = useRef(null); const lmap = useRef(null); const [mday, setMday] = useState("all");
-  
-  useEffect(() => {
-    if (!mapRef.current) return; if (lmap.current) { lmap.current.remove(); }
-    const map = L.map(mapRef.current, { zoomControl: true }).setView([33.5904, 130.4207], 6);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-    
-    const isAll = mday === "all";
-    const allArr = Object.entries(SPOT_DATA).flatMap(([d, arr]) => arr.map(s => ({ ...s, day: Number(d) })));
-    
-    if (isAll) {
-      for(let d=1; d<=10; d++) {
-        const ds = allArr.filter(s => s.day === d && s.lat);
-        if(ds.length >= 2) L.polyline(ds.map(s => [s.lat, s.lng]), { color: DC[d], weight: 3 }).addTo(map);
-      }
-    } else {
-      const ds = allArr.filter(s => s.day === Number(mday) && s.lat);
-      if(ds.length >= 2) L.polyline(ds.map(s => [s.lat, s.lng]), { color: DC[mday], weight: 4 }).addTo(map);
-    }
-
-    const showSpots = isAll ? allArr : allArr.filter(s => s.day === Number(mday));
-    showSpots.filter(s => s.lat).forEach(s => {
-      L.marker([s.lat, s.lng]).addTo(map).bindPopup(`<b>${s.name}</b>`);
+async function apiCall(action,body={}){
+  if(!ST.apiUrl)return null;
+  try{
+    // text/plain avoids CORS preflight; Apps Script reads via e.postData.contents
+    const res=await fetch(ST.apiUrl,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action,...body}),
+      redirect:"follow"
     });
-
-    const pts = showSpots.filter(s => s.lat).map(s => [s.lat, s.lng]);
-    if(pts.length > 0) map.fitBounds(pts, { padding: [40, 40] });
-    lmap.current = map;
-  }, [mday]);
-
-  return React.createElement("div", { class: "flex flex-col h-[65vh] w-full" },
-    React.createElement("div", { class: "flex gap-2 overflow-x-auto pb-2 mb-2" },
-      ["all",1,2,3,4,5,6,7,8,9,10].map(d => React.createElement("button", { key:d, onClick:()=>setMday(d), class: `flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border ${mday===d?'bg-gray-800 text-white':'bg-white text-gray-600'}` }, d==="all"?"全程":`D${d}`))
-    ),
-    React.createElement("div", { ref: mapRef, class: "flex-1 w-full rounded-2xl border bg-white shadow-sm z-10" })
-  );
+    const text=await res.text();
+    return JSON.parse(text);
+  }catch(e){console.warn("API error:",e);return null;}
+}
+async function apiGet(){
+  if(!ST.apiUrl)return null;
+  try{
+    const res=await fetch(ST.apiUrl,{redirect:"follow"});
+    const text=await res.text();
+    return JSON.parse(text);
+  }catch(e){console.warn("API GET error:",e);return null;}
 }
 
-function AccomLayout() {
-  const order = ["h_encore", "h_ferry", "h_grandbase", "h_kamenoi", "h_yukigumo", "h_ref", "h_vessel", "h_lamp"];
-  return React.createElement("div", { class: "max-w-xl mx-auto space-y-4" },
-    order.map((k) => {
-      const h = HOTELS[k]; if(!h) return null;
-      return React.createElement("div", { key: k, class: "bg-white p-5 rounded-2xl shadow-sm border-t-4 border-blue-500" },
-        React.createElement("h3", { class: "font-black text-lg text-blue-900" }, h.zh),
-        React.createElement("p", { class: "text-sm text-gray-600 mt-1 word-wrap" }, `📍 ${h.addr}`),
-        React.createElement("p", { class: "text-xs text-gray-500 mt-2 bg-amber-50 p-2 rounded-lg" }, h.note),
-        React.createElement("div", { class: "text-xs text-red-500 font-bold mt-2" }, h.cost),
-        h.url && React.createElement("a", { href: h.url, target: "_blank", rel: "noopener noreferrer", class: "block mt-4 bg-yellow-400 text-center py-3 rounded-xl font-bold text-sm touch-target flex items-center justify-center shadow-sm" }, "🔗 開啟訂單憑證網頁")
-      );
-    })
-  );
+function showSync(msg){
+  let el=document.getElementById("syncBar");
+  if(!el){el=document.createElement("div");el.id="syncBar";el.className="sync";document.body.appendChild(el);}
+  el.textContent=msg;el.classList.remove("hide");
+  if(msg.includes("✓"))setTimeout(()=>el.classList.add("hide"),2000);
 }
 
-function ExpenseLayout({ expenses, onAdd, rates }) {
-  const [label, setLabel] = useState(""); const [amt, setAmt] = useState(""); const [cur, setCur] = useState("JPY"); const [who, setWho] = useState("共同"); const [day, setDay] = useState("1");
-  const totalTWD = expenses.reduce((sum, e) => sum + (e.twd ? Number(e.twd) : 0), 0);
-  const pStats = { "共同": 0, "CHIHJUI": 0, "Cony": 0, "Penny": 0, "張爸": 0, "張媽": 0 };
-  expenses.forEach(e => { if(pStats[e.who] !== undefined) pStats[e.who] += Number(e.twd || 0); });
-
-  const handleSubmit = (e) => {
-    e.preventDefault(); if (!label || !amt) return;
-    let rate = 1; if (cur === "JPY") rate = rates.JPY; if (cur === "KRW") rate = rates.KRW;
-    const twdCost = Math.round(Number(amt) * rate);
-    onAdd({ id: Date.now().toString(), ts: new Date().toISOString(), day, cat: "支出", label, amt, cur, who, twd: twdCost });
-    setLabel(""); setAmt("");
-  };
-
-  return React.createElement("div", { class: "max-w-xl mx-auto space-y-4" },
-    React.createElement("div", { class: "bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl p-5 text-white" },
-      React.createElement("div", { class: "text-sm font-bold" }, "📊 家族全團累計開銷"),
-      React.createElement("div", { class: "text-2xl font-black mt-1" }, `NT$ ${totalTWD.toLocaleString()}`)
-    ),
-    React.createElement("div", { class: "bg-white p-4 rounded-2xl shadow-sm grid grid-cols-2 gap-2" }, Object.entries(personalStats).map(([p, v]) => React.createElement("div", { key: p, class: "bg-gray-50 p-2 rounded-xl" }, React.createElement("div", { class: "text-xs text-gray-400" }, p), React.createElement("div", { class: "text-sm font-bold text-blue-900" }, `NT$ ${v.toLocaleString()}`)))),
-    React.createElement("form", { onSubmit: handleSubmit, class: "bg-white p-4 rounded-2xl shadow-sm space-y-3" },
-      React.createElement("input", { value: label, onChange: e => setLabel(e.target.value), placeholder: "消費項目說明 (如: 藥院燒肉餐費)", class: "w-full border border-gray-200 p-3 rounded-xl text-sm" }),
-      React.createElement("div", { class: "grid grid-cols-2 gap-2" }, React.createElement("input", { type: "number", value: amt, onChange: e => setAmt(e.target.value), placeholder: "金額", class: "border border-gray-200 p-3 rounded-xl text-sm" }), React.createElement("select", { value: cur, onChange: e => setCur(e.target.value), class: "border border-gray-200 p-3 rounded-xl text-sm bg-white" }, React.createElement("option", { value: "JPY" }, "¥ 日圓"), React.createElement("option", { value: "KRW" }, "₩ 韓圓"), React.createElement("option", { value: "TWD" }, "NT$ 台幣"))),
-      React.createElement("div", { class: "grid grid-cols-2 gap-2" }, React.createElement("select", { value: who, onChange: e => setWho(e.target.value), class: "border border-gray-200 p-3 rounded-xl text-sm bg-white" }, Object.keys(personalStats).map(p => React.createElement("option", { key: p, value: p }, p))), React.createElement("select", { value: day, onChange: e => setDay(e.target.value), class: "border border-gray-200 p-3 rounded-xl text-sm bg-white" }, [1,2,3,4,5,6,7,8,9,10].map(d => React.createElement("option", { key: d, value: d }, `Day ${d}`)))),
-      React.createElement("button", { type: "submit", class: "w-full bg-blue-600 text-white p-3 rounded-xl font-bold text-sm touch-target" }, "確認記帳")
-    )
-  );
+async function loadAll(){
+  ST.apiUrl=sg("t26_api","")||DEPLOY_API_URL||"";
+  // Load local first
+  ST.exps=sg("t26_ex",[]);ST.done=sg("t26_dn",{});ST.notes=sg("t26_nt",{});
+  ST.extra=sg("t26_xtr",{});ST.rates=sg("t26_rt",{JPY:0.222,KRW:0.0233});
+  ST.albumUrl=sg("t26_alb","")||DEPLOY_ALBUM_URL;ST.travelers=sg("t26_trv",ST.travelers)||ST.travelers;
+  ST.budgetItems=sg("t26_bgt",null);
+  render();
+  // Then load from API
+  if(ST.apiUrl){
+    showSync("⏳ 同步中…");
+    const r=await apiGet();
+    if(r&&r.ok&&r.data){
+      const d=r.data;
+      if(d.expenses){ST.exps=d.expenses;ls("t26_ex",d.expenses);}
+      if(d.notes&&Object.keys(d.notes).length){ST.notes=d.notes;ls("t26_nt",d.notes);}
+      if(d.done&&Object.keys(d.done).length){ST.done=d.done;ls("t26_dn",d.done);}
+      if(d.config){
+        if(d.config.albumUrl)ST.albumUrl=d.config.albumUrl;
+        if(d.config.rates)try{ST.rates=JSON.parse(d.config.rates);}catch{}
+      }
+      if(d.budget&&d.budget.length){ST.budgetItems=d.budget;ls("t26_bgt",d.budget);}
+      showSync("✓ 已同步");render();
+    } else showSync("⚠️ 同步失敗，使用本地資料");
+  }
 }
 
-function MoreLayout() {
-  return React.createElement("div", { class: "max-w-xl mx-auto space-y-4" },
-    React.createElement("div", { class: "bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500" },
-      React.createElement("h3", { class: "font-bold text-lg text-blue-900 mb-1" }, "🤖 Gemini 家族智慧 AI 助手"),
-      React.createElement("a", { href: "https://gemini.google.com", target: "_blank", class: "block w-full bg-gradient-to-r from-orange-400 to-amber-500 text-white text-center py-3 rounded-xl font-bold text-sm" }, "💬 開啟聯網 AI 對話小幫手")
-    ),
-    React.createElement("div", { class: "bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500" },
-      React.createElement("h3", { class: "font-bold text-lg text-blue-900 mb-1" }, "🖼️ Google Photos 家族照片牆"),
-      React.createElement("a", { href: "https://photos.google.com", target: "_blank", class: "block w-full bg-emerald-500 text-white text-center py-3 rounded-xl font-bold text-sm" }, "📸 進入 Google 家族照片牆")
-    ),
-    React.createElement("div", { class: "bg-white p-4 rounded-2xl shadow-sm" },
-      React.createElement("h3", { class: "font-bold text-sm text-gray-400 mb-2" }, "👥 家族同行成員"),
-      React.createElement("div", { class: "grid grid-cols-3 gap-2" }, TRAVELERS.map(t => React.createElement("div", { key: t.id, class: "bg-gray-50 p-2 rounded-xl text-center" }, React.createElement("span", { class: "text-xl" }, t.icon), React.createElement("div", { class: "text-xs font-bold text-blue-950 mt-1" }, t.zh))))
-    )
-  );
+function set(k,v,sync=true){
+  ST[k]=v;
+  const LK={exps:"t26_ex",done:"t26_dn",notes:"t26_nt",extra:"t26_xtr",rates:"t26_rt",albumUrl:"t26_alb",travelers:"t26_trv",budgetItems:"t26_bgt"};
+  if(LK[k])ls(LK[k],v);
+  render();
+  if(!sync||!ST.apiUrl)return;
+  // API sync for shared data
+  if(k==="albumUrl")apiCall("set_config",{key:"albumUrl",value:v});
+  if(k==="rates")apiCall("set_config",{key:"rates",value:JSON.stringify(v)});
+  if(k==="budgetItems")apiCall("update_budget",{items:v});
+}
+function sn(k,v){ST[k]=v;render();}
+
+// ═══ HELPERS ═══
+function toTWD(a,c){if(!a)return 0;const n=Number(a);if(c==="TWD")return n;if(c==="KRW")return Math.round(n*ST.rates.KRW);return Math.round(n*ST.rates.JPY);}
+function nf(n){return Math.round(Number(n)).toLocaleString();}
+function allSpots(){return Object.entries(SPOTS).flatMap(([d,arr])=>arr.map(s=>({...s,day:Number(d)})));}
+
+// ═══ COUNTDOWN ═══
+function updateCD(){
+  const days=Math.max(0,Math.ceil((new Date("2026-06-26")-new Date())/86400000));
+  const el=document.getElementById("dLeft"),lb=document.getElementById("dLbl");
+  if(el)el.textContent=days>0?days:"🎉";
+  if(lb)lb.textContent=days>0?"天後出發":"出發啦！";
 }
 
-function useW() {
-  const [w, setW] = useState(window.innerWidth);
-  useEffect(() => {
-    const h = () => setW(window.innerWidth); window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
-  }, []); return w;
+// ═══ NAVIGATION ═══
+function go(t){
+  ST.tab=t;
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("act",b.dataset.t===t));
+  const subs={map:"地圖導覽",itin:"旅行行程",accom:"住宿總覽",expense:"旅遊記帳",ai:"AI旅遊助手",more:"更多功能"};
+  const s=document.getElementById("subTitle");if(s)s.textContent=subs[t]||"";
+  render();
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+// ═══ LEAFLET MAP ═══
+let mapInst=null,mapCurDay=null;
+function buildMap(day){
+  // Always destroy old map first
+  if(mapInst){try{mapInst.off();mapInst.remove();}catch(e){}mapInst=null;}
+  const el=document.getElementById("mapEl");
+  if(!el)return;
+  // Set height via JS (more reliable than CSS calc)
+  // Height is now set by flex:1 in CSS — just ensure Leaflet knows the size
+  mapCurDay=day;
+  const isAll=day==="all";
+  const AS=allSpots();
+  const pts=(isAll?AS:(SPOTS[Number(day)]||[]).map(s=>({...s,day:Number(day)}))).filter(s=>s.lat&&s.lng);
+  if(!pts.length)return;
+  try{
+    const map=L.map(el,{zoomControl:true,attributionControl:true});
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OSM",maxZoom:18}).addTo(map);
+    function route(arr,col){
+      const v=arr.filter(s=>s.lat&&s.lng);
+      for(let i=0;i<v.length-1;i++){
+        L.polyline([[v[i].lat,v[i].lng],[v[i+1].lat,v[i+1].lng]],{color:col,weight:3.5,dashArray:"7,4",opacity:.85}).addTo(map);
+        const ang=Math.atan2(v[i+1].lng-v[i].lng,v[i+1].lat-v[i].lat)*(180/Math.PI);
+        const ml=[(v[i].lat+v[i+1].lat)/2,(v[i].lng+v[i+1].lng)/2];
+        L.marker(ml,{icon:L.divIcon({className:"",html:`<span style="transform:rotate(${-ang+90}deg);display:block;font-size:13px;color:${col};text-shadow:0 0 3px #fff;line-height:1">▶</span>`,iconSize:[13,13],iconAnchor:[6,6]}),interactive:false}).addTo(map);
+      }
+    }
+    if(isAll){for(let d=1;d<=10;d++)route(AS.filter(s=>s.day===d&&s.lat&&s.lng),DC[d]||"#0277BD");}
+    else route(pts,DC[Number(day)]||"#0277BD");
+    let sn2=0;
+    pts.forEach(sp=>{
+      const c=DC[sp.day]||"#0277BD",isH=["T","F","FT"].includes(sp.t);
+      if(!isH)sn2++;
+      const lbl=isH?({F:"F",T:"T",FT:"F/T"}[sp.t]||"H"):(isAll?`D${sp.day}`:String(sn2));
+      const sz=isH?28:24;
+      const ic=L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${isH?c+"99":c};border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${isH?9:10}px;font-weight:700;color:#fff;box-shadow:0 1px 6px rgba(0,0,0,.25)">${lbl}</div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],popupAnchor:[0,-sz/2]});
+      const burl=sp.hk?BOOKING[sp.hk]:"";
+      L.marker([sp.lat,sp.lng],{icon:ic}).addTo(map).bindPopup(`<div style="font-size:13px;font-family:'DM Sans',sans-serif;min-width:170px"><div style="font-size:10px;color:${c};font-weight:700;margin-bottom:2px">Day${sp.day} ${DM2[sp.day]||""} · ${DT[(sp.day||1)-1]}</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">${sp.nm}</div>${sp.hours?`<div>🕐 ${sp.hours}</div>`:""}${sp.price?`<div style="color:#0277BD;font-weight:600">💰 ${sp.price}</div>`:""}${sp.note?`<div style="color:#546E7A;font-size:11px;margin-top:2px">${sp.note}</div>`:""}<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">${sp.gmap?`<a href="${sp.gmap}" target="_blank" style="background:#4285F4;color:#fff;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none">Google</a>`:""}${sp.naver?`<a href="${sp.naver}" target="_blank" style="background:#03C75A;color:#fff;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none">Naver</a>`:""}${burl?`<a href="${burl}" target="_blank" style="background:${c};color:#fff;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;text-decoration:none">訂單</a>`:""}</div></div>`,{maxWidth:280});
+    });
+    const bounds=pts.map(s=>[s.lat,s.lng]);
+    if(bounds.length)map.fitBounds(bounds,{padding:[44,44],maxZoom:isAll?5:12});
+    mapInst=map;
+    setTimeout(()=>{try{map.invalidateSize();}catch(e){}},300);
+  }catch(e){console.error("Map error:",e);}
+}
+
+// ═══ RENDER ═══
+function render(){
+  const el=document.getElementById("mainEl");if(!el)return;
+  const t=ST.tab;
+  if(t==="map")rMap(el);
+  else if(t==="itin")rItin(el);
+  else if(t==="accom")rAccom(el);
+  else if(t==="expense")rExp(el);
+  else if(t==="ai")rAI(el);
+  else if(t==="more")rMore(el);
+}
+
+// ─── MAP ───
+function changeMapDay(dd){
+  ST.mapDay=dd;
+  // Only update pills UI, don't re-render whole tab
+  const pillsEl=document.getElementById("mapPills");
+  if(pillsEl)pillsEl.innerHTML=buildPills(dd);
+  buildMap(dd);
+}
+function buildPills(active){
+  return ["all",1,2,3,4,5,6,7,8,9,10].map(dd=>{
+    const act=active===dd,c=dd==="all"?"#01579B":(DC[dd]||"#0277BD");
+    const lbl=dd==="all"?`🗺️<br><span style="font-size:9px">全程</span>`:`${DEM[dd-1]||""}<br><span style="font-size:11px;font-weight:700">D${dd}</span><br><span style="font-size:9px">${DM2[dd]||""}</span>`;
+    return`<button onclick="changeMapDay(${JSON.stringify(dd)})" style="flex-shrink:0;min-width:${dd==="all"?58:50}px;padding:5px 7px;border-radius:10px;border:2px solid ${act?c:"#D1EAF5"};background:${act?c:"#fff"};color:${act?"#fff":c};font-size:12px;cursor:pointer;font-family:inherit;min-height:50px;line-height:1.3;display:flex;flex-direction:column;align-items:center;justify-content:center">${lbl}</button>`;
+  }).join("");
+}
+function rMap(el){
+  const d=ST.mapDay;
+  // Destroy old map immediately before setting innerHTML
+  if(mapInst){try{mapInst.off();mapInst.remove();}catch(e){}mapInst=null;}
+  el.innerHTML=
+    '<div style="display:flex;flex-direction:column;height:100%;overflow:hidden">'+
+      '<div id="mapPills" style="flex-shrink:0;background:#fff;border-bottom:1px solid #E1EEF6;padding:9px 13px 7px;display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">'+buildPills(d)+'</div>'+
+      '<div id="mapEl" style="flex:1;min-height:200px;background:#E8F4F8"></div>'+
+    '</div>';
+  // Double rAF ensures layout is complete before Leaflet reads dimensions
+  requestAnimationFrame(()=>requestAnimationFrame(()=>buildMap(d)));
+}
+
+// ─── ITIN ───
+function rItin(el){
+  const dd=ST.itinDay,col=DC[dd]||"#0277BD";
+  const dspots=SPOTS[dd]||[],xtra=ST.extra[dd]||[],meal=MEALS[dd-1];
+  const pills=Array.from({length:10},(_,i)=>i+1).map(dn=>{
+    const act=dn===dd,c=DC[dn]||"#0277BD";
+    return`<div onclick="ST.itinDay=${dn};render()" class="daypill" style="border-color:${act?c:"#D1EAF5"};background:${act?c:"#fff"};color:${act?"#fff":c}"><span style="font-size:15px">${DEM[dn-1]||""}</span><span style="font-size:11px;font-weight:700">D${dn}</span><span style="font-size:9px;opacity:.85">${DM2[dn]||""}</span></div>`;
+  }).join("");
+  const mCard=meal?`<div style="background:${col};border-radius:14px;padding:12px 15px;margin-bottom:12px;color:#fff"><div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:8px">${DEM[dd-1]} D${dd} ${DM2[dd]} · ${DT[dd-1]}</div><div style="display:flex;flex-wrap:wrap;gap:7px">${[["☀️早",meal.m],["🌞午",meal.l],["🌙晚",meal.dn],["🍰點",meal.s]].filter(([,v])=>v).map(([l,v])=>`<div style="background:rgba(255,255,255,.2);border-radius:9px;padding:6px 10px"><div style="font-size:10px;font-weight:700;opacity:.9">${l}</div><div style="font-size:12px;margin-top:1px">${v}</div></div>`).join("")}</div></div>`:"";
+    const routeBtn='<button onclick="go(\'map\');ST.mapDay='+dd+';render();setTimeout(()=>changeMapDay('+dd+'),150)"'+'style="display:flex;align-items:center;gap:6px;background:#EEF6FC;border:1px solid #D1EAF5;'+'border-radius:10px;padding:9px 14px;cursor:pointer;font-family:inherit;font-size:13px;'+'color:#0277BD;font-weight:600;width:100%;justify-content:center;margin-bottom:12px;min-height:44px">'+'🗺️ 查看 D'+dd+' 路線地圖 →</button>';
+  const items=[...dspots.map((s,i)=>({...s,_k:`${dd}_${i}`,_i:i,_ex:false})),...xtra.map((s,i)=>({...s,_k:`${dd}_x${i}`,_i:i,_ex:true}))];
+  const spotsH=items.map((sp,vi)=>{
+    const k=sp._k,isDone=!!ST.done[k],note=ST.notes[k]||"";
+    const isH=["T","F","FT"].includes(sp.t);
+    const lbl=isH?({F:"F",T:"T",FT:"F/T"}[sp.t]||"H"):String(vi+1);
+    const hotel=sp.hk?HOTELS[sp.hk]:null;
+    const burl=sp.hk?BOOKING[sp.hk]:"";
+    const chk=isDone?
+      `<div onclick="toggleDone('${k}')" style="width:24px;height:24px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#fff;font-size:14px">✓</div>`:
+      `<div onclick="toggleDone('${k}')" style="width:24px;height:24px;border-radius:50%;border:2px solid #D1EAF5;background:#fff;cursor:pointer;flex-shrink:0"></div>`;
+    return`<div class="spot" style="${isH?`border-left:3px solid ${col};`:""}opacity:${isDone?.6:1}">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div class="spot-circle" style="background:${isH?col+"55":col};color:${isH?col:"#fff"};${isH?`border:1.5px solid ${col};width:34px;height:34px`:""}">${lbl}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+            <div style="font-weight:600;font-size:14px;color:${isDone?"#90A4AE":"#1A2E3B"};text-decoration:${isDone?"line-through":"none"};line-height:1.35;word-break:break-word">${sp.nm}</div>
+            <div style="display:flex;gap:4px;flex-shrink:0">${sp._ex?`<button onclick="delXtra(${dd},${sp._i})" style="background:none;border:none;cursor:pointer;color:#C62828;font-size:15px;min-width:26px;min-height:26px">🗑</button>`:""}${chk}</div>
+          </div>
+          ${(sp.hours||sp.price)?`<div style="font-size:12px;color:#546E7A;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap">${sp.hours?`<span>🕐 ${sp.hours}</span>`:""}${sp.price?`<span style="color:#0277BD;font-weight:600">💰 ${sp.price}</span>`:""}</div>`:""}
+          ${sp.note?`<div style="font-size:12px;color:#546E7A;margin-top:3px;line-height:1.4">${sp.note}</div>`:""}
+          ${sp.mc?`<div style="font-size:11px;color:#90A4AE;margin-top:2px;font-family:monospace">📍 ${sp.mc}</div>`:""}
+          ${hotel&&isH?`<div style="margin-top:7px;background:#F0F9FF;border-radius:9px;padding:8px 10px;font-size:12px">${hotel.day?`<div style="font-weight:600;color:${col};margin-bottom:2px">${hotel.day}</div>`:""} ${hotel.addr?`<div style="color:#546E7A">📍 ${hotel.addr}</div>`:""} ${hotel.phone?`<div>📞 <a href="tel:${hotel.phone}" style="color:#0277BD;font-weight:600">${hotel.phone}</a></div>`:""} ${hotel.ref?`<div style="font-family:monospace;color:#0277BD;font-size:11px">${hotel.ref}</div>`:""} <div style="color:#BF360C;font-weight:600">💳 ${hotel.cost}</div> ${hotel.note?`<div style="color:#546E7A;font-style:italic;margin-top:2px;font-size:11px">${hotel.note}</div>`:""}</div>`:""}
+          <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">
+            ${sp.naver?`<a href="${sp.naver}" target="_blank" class="mpill" style="background:#03C75A">Naver</a>`:""}
+            ${sp.gmap?`<a href="${sp.gmap}" target="_blank" class="mpill" style="background:#4285F4">Google</a>`:""}
+            ${burl?`<a href="${burl}" target="_blank" class="mpill" style="background:${col}">📋 訂單</a>`:""}
+          </div>
+          ${note?`<div style="margin-top:5px;font-size:12px;color:#0277BD;background:#EEF6FC;border-radius:8px;padding:5px 9px">📝 ${note}</div>`:""}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  el.innerHTML=`<div class="section"><div class="dayrow">${pills}</div>${mCard}${routeBtn}${spotsH}<button onclick="openAddSpot(${dd})" class="btn-g" style="width:100%;margin-top:4px">＋ 新增景點</button></div>${ST.addSpotDay===dd?addSpotModal(dd):""}`;
+}
+function toggleDone(k){
+  const d={...ST.done};d[k]=!d[k];set("done",d,false);
+  if(ST.apiUrl)apiCall("toggle_done",{key:k});
+}
+function delXtra(day,idx){const x={...ST.extra};const a=[...(x[day]||[])];a.splice(idx,1);x[day]=a;set("extra",x);}
+function openAddSpot(d){sn("addSpotDay",d);}
+function addSpotModal(day){
+  return`<div class="modal-bg" onclick="if(event.target===this)sn('addSpotDay',null)"><div class="modal"><div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:${DC[day]||"#0277BD"};margin-bottom:12px">D${day} 新增景點</div><div style="display:flex;flex-direction:column;gap:9px"><input class="inp" id="ns_nm" placeholder="景點/餐廳名稱 *"><input class="inp" id="ns_gm" placeholder="Google Maps 連結"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px"><input class="inp" id="ns_hr" placeholder="營業時間"><input class="inp" id="ns_pr" placeholder="票價"></div><input class="inp" id="ns_nt" placeholder="備注"><div style="display:flex;gap:9px"><button class="btn-p" style="flex:1" onclick="saveNewSpot()">新增 ✓</button><button class="btn-g" onclick="sn('addSpotDay',null)">取消</button></div></div></div></div>`;
+}
+function saveNewSpot(){
+  const nm=document.getElementById("ns_nm")?.value?.trim();if(!nm)return;
+  const sp={t:"s",lat:0,lng:0,nm,gmap:document.getElementById("ns_gm")?.value||"",hours:document.getElementById("ns_hr")?.value||"",price:document.getElementById("ns_pr")?.value||"",note:document.getElementById("ns_nt")?.value||""};
+  const x={...ST.extra};x[ST.addSpotDay]=[...(x[ST.addSpotDay]||[]),sp];
+  set("extra",x);sn("addSpotDay",null);
+}
+
+// ─── ACCOM ───
+const HORD=["h_encore","h_ferry","h_grandbase","h_kamenoi","h_yukigumo","h_ref","h_vessel","h_lamp"];
+const HICO={h_encore:"🇰🇷",h_ferry:"⛴️",h_grandbase:"🏠",h_kamenoi:"♨️",h_yukigumo:"🎭",h_ref:"🏯",h_vessel:"🎨",h_lamp:"🎪"};
+const HCOL={h_encore:"#C62828",h_ferry:"#6A1B9A",h_grandbase:"#BF360C",h_kamenoi:"#2E7D32",h_yukigumo:"#1565C0",h_ref:"#880E4F",h_vessel:"#006064",h_lamp:"#4527A0"};
+function rAccom(el){
+  const html=HORD.map(hk=>{
+    const h=HOTELS[hk];if(!h)return"";
+    const c=HCOL[hk]||"#0277BD",isO=ST.accomOpen[hk],burl=BOOKING[hk]||"";
+    return`<div class="card"><div class="card-top" style="background:${c}"></div><div class="card-body" onclick="ST.accomOpen['${hk}']=!ST.accomOpen['${hk}'];render()" style="cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1;min-width:0"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px"><span>${HICO[hk]||"🏨"}</span><span class="pill" style="background:${c}18;color:${c}">${h.day}</span></div><div style="font-weight:600;font-size:15px;word-break:break-word">${h.zh}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-weight:600;font-size:12px;color:#BF360C">${h.cost.split("（")[0]}</div><div style="color:#90A4AE;margin-top:2px">${isO?"▲":"▼"}</div></div></div></div>${isO?`<div style="padding:0 14px 14px;border-top:1px solid #E1EEF6;max-height:320px;overflow-y:auto"><div style="display:flex;flex-direction:column;gap:5px;margin-top:9px">${h.addr?`<div style="font-size:12px;color:#546E7A">📍 ${h.addr}</div>`:""} ${h.phone?`<div style="font-size:12px">📞 <a href="tel:${h.phone}" style="color:#0277BD;font-weight:600">${h.phone}</a></div>`:""} ${h.ref?`<div style="font-size:12px;font-family:monospace;color:#0277BD">${h.ref}</div>`:""} ${h.ci?`<div style="font-size:12px;color:#546E7A">🕐 CI ${h.ci} / CO ${h.co}</div>`:""} <div style="font-weight:600;font-size:12px;color:#BF360C">💳 ${h.cost}</div> ${h.note?`<div style="background:#F0F9FF;border-radius:9px;padding:8px 10px;font-size:12px;line-height:1.6">${h.note}</div>`:""} ${burl?`<a href="${burl}" target="_blank" class="btn-p" style="text-decoration:none;margin-top:5px;font-size:13px">📋 查看訂單確認頁 ↗</a>`:""}</div></div>`:""}</div>`;
+  }).join("");
+  el.innerHTML=`<div class="section"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:3px">🏨 住宿總覽</div><div style="font-size:13px;color:#546E7A;margin-bottom:14px">9晚合計：<strong style="color:#0277BD">NT$106,274</strong>（含渡輪）</div>${html}</div>`;
+}
+
+// ─── EXPENSE ───
+const ECATS=["🍜 餐飲","🚗 交通","🎡 景點","🛒 購物","🏨 住宿","💊 醫療","✨ 其他"];
+function rExp(el){
+  const total=ST.exps.reduce((s,e)=>s+toTWD(e.amt,e.cur),0);
+  const d1=new Date("2026-06-26"),diff=Math.floor((new Date()-d1)/86400000)+1,td=Math.min(Math.max(diff,1),10);
+  const todayN=ST.exps.filter(e=>e.day===td).reduce((s,e)=>s+toTWD(e.amt,e.cur),0);
+  const rows=ST.exps.sort((a,b)=>new Date(b.ts)-new Date(a.ts)).map(e=>{
+    const twd=toTWD(e.amt,e.cur),c=DC[e.day]||"#0277BD";
+    return`<div style="background:#fff;border-radius:12px;border:1px solid #E1EEF6;border-left:3px solid ${c};padding:11px 13px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span style="font-size:18px">${e.cat.split(" ")[0]}</span>
+            <span style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;max-width:130px;white-space:nowrap">${e.label||"（未命名）"}</span>
+            <span class="tag" style="background:${c}18;color:${c}">D${e.day} ${DM2[e.day]||""}</span>
+          </div>
+          <div style="font-size:11px;color:#90A4AE;margin-top:2px">${e.who||""}${e.ts?" · "+new Date(e.ts).toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):""}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-weight:600;font-size:14px">${e.cur} ${nf(e.amt)}</div>
+          ${twd?`<div style="font-size:11px;color:#546E7A">≈NT$${nf(twd)}</div>`:""}
+          <div style="display:flex;gap:4px;margin-top:3px;justify-content:flex-end">
+            <button onclick="openExpEdit('${e.id}')" style="background:#F0F9FF;border:1px solid #D1EAF5;border-radius:7px;cursor:pointer;font-size:12px;padding:2px 7px;color:#0277BD;font-family:inherit">✏️</button>
+            <button onclick="delExp('${e.id}')" style="background:#FFF0F0;border:1px solid #FFCDD2;border-radius:7px;cursor:pointer;font-size:12px;padding:2px 7px;color:#C62828;font-family:inherit">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  el.innerHTML=`<div class="section"><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px"><div style="background:#01579B;border-radius:14px;padding:13px 14px;color:#fff"><div style="font-size:11px;opacity:.8;margin-bottom:3px">旅途合計</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600">NT$ ${nf(total)}</div><div style="font-size:11px;opacity:.7;margin-top:2px">${ST.exps.length}筆 · 每人≈NT$${nf(total/9)}</div></div><div style="background:#00695C;border-radius:14px;padding:13px 14px;color:#fff"><div style="font-size:11px;opacity:.8;margin-bottom:3px">今日 D${td} ${DM2[td]||""}</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600">NT$ ${nf(todayN)}</div><div style="font-size:11px;opacity:.7;margin-top:2px">${ST.exps.filter(e=>e.day===td).length}筆</div></div></div><div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn-p" onclick="openExpAdd()">＋ 記帳</button></div>${ST.exps.length===0?`<div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;padding:30px 20px;text-align:center;color:#90A4AE"><div style="font-size:40px;margin-bottom:8px">🧾</div><div style="font-weight:600">點 ＋記帳 開始記錄</div></div>`:`<div style="display:flex;flex-direction:column;gap:7px">${rows}</div>`}</div>${(ST.addExp||ST.editExpId)?expModal():""}`;
+}
+function openExpAdd(){
+  const d1=new Date("2026-06-26"),diff=Math.floor((new Date()-d1)/86400000)+1;
+  ST.expForm={cat:"🍜 餐飲",label:"",amt:"",cur:"JPY",who:"共同",day:Math.min(Math.max(diff,1),10)};
+  ST.addExp=true;ST.editExpId=null;render();
+}
+function openExpEdit(id){
+  const ex=ST.exps.find(e=>e.id===id);if(!ex)return;
+  ST.expForm={...ex};ST.editExpId=id;ST.addExp=false;render();
+}
+function closeExp(){ST.addExp=false;ST.editExpId=null;render();}
+function delExp(id){
+  if(!confirm("確定刪除？"))return;
+  set("exps",ST.exps.filter(e=>e.id!==id),false);
+  if(ST.apiUrl)apiCall("delete_expense",{id});
+}
+function saveExp2(){
+  const f=ST.expForm;if(!f.label||!f.amt)return;
+  if(ST.editExpId){
+    set("exps",ST.exps.map(e=>e.id===ST.editExpId?{...e,...f}:e),false);
+    if(ST.apiUrl)apiCall("update_expense",{id:ST.editExpId,updates:f});
+  } else {
+    const newE={...f,id:Date.now().toString(),ts:new Date().toISOString()};
+    set("exps",[...ST.exps,newE],false);
+    if(ST.apiUrl)apiCall("add_expense",newE);
+  }
+  closeExp();
+}
+function expModal(){
+  const f=ST.expForm,isEd=!!ST.editExpId,twd=f.amt?toTWD(f.amt,f.cur):0;
+  return`<div class="modal-bg" onclick="if(event.target===this)closeExp()"><div class="modal"><div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0277BD;margin-bottom:12px">${isEd?"✏️ 編輯":"＋ 新增"}費用</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px">${ECATS.map(c=>`<button onclick="ST.expForm.cat='${c}';render()" style="padding:6px 10px;border-radius:16px;border:2px solid ${f.cat===c?"#0277BD":"#D1EAF5"};background:${f.cat===c?"#EEF6FC":"#fff"};color:${f.cat===c?"#0277BD":"#546E7A"};font-size:12px;font-weight:${f.cat===c?600:400};cursor:pointer;font-family:inherit;min-height:36px">${c}</button>`).join("")}</div><div style="display:flex;flex-direction:column;gap:8px"><input class="inp" value="${(f.label||"").replace(/"/g,"&quot;")}" oninput="ST.expForm.label=this.value" placeholder="說明（拉麵・油資・門票）"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><input class="inp" type="text" inputmode="decimal" value="${f.amt||""}" oninput="ST.expForm.amt=this.value" placeholder="金額">${twd?`<div style="font-size:11px;color:#546E7A;margin-top:2px">≈NT$${nf(twd)}</div>`:""}</div><select class="inp" onchange="ST.expForm.cur=this.value"><option value="JPY" ${f.cur==="JPY"?"selected":""}>¥ 日圓</option><option value="TWD" ${f.cur==="TWD"?"selected":""}>NT$ 台幣</option><option value="KRW" ${f.cur==="KRW"?"selected":""}>₩ 韓圓</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><select class="inp" onchange="ST.expForm.who=this.value">${["共同","Claudia","Cony","Penny","張爸","張媽"].map(p=>`<option value="${p}" ${f.who===p?"selected":""}>${p}</option>`).join("")}</select><select class="inp" onchange="ST.expForm.day=Number(this.value)">${Array.from({length:10},(_,i)=>i+1).map(d=>`<option value="${d}" ${f.day===d?"selected":""}>D${d} ${DM2[d]||""}</option>`).join("")}</select></div><div style="display:flex;gap:8px;margin-top:3px"><button class="btn-p" style="flex:1" onclick="saveExp2()">${isEd?"儲存 ✓":"記帳 ✓"}</button><button class="btn-g" onclick="closeExp()">取消</button></div></div></div></div>`;
+}
+
+// ─── AI ───
+async function sendAI(){
+  const msg=ST.aiIn.trim();if(!msg||ST.aiLoad)return;
+  const hist=[...ST.aiHist,{role:"user",content:msg}];
+  ST.aiHist=hist;ST.aiIn="";ST.aiLoad=true;render();
+  setTimeout(()=>{const c=document.getElementById("chatA");if(c)c.scrollTop=c.scrollHeight;},50);
+  try{
+    if(!ST.apiUrl){
+      ST.aiHist=[...hist,{role:"assistant",content:"⚠️ 請先在「更多 → 設定」填入 Google Apps Script URL，AI 助手才能使用。"}];
+    } else {
+      const r=await apiCall("ask_ai",{messages:hist.map(m=>({role:m.role,content:m.content}))});
+      const reply=(r&&r.ok&&r.reply)?r.reply:"抱歉，無法回覆，請確認 API 設定。";
+      ST.aiHist=[...hist,{role:"assistant",content:reply}];
+    }
+  }catch(e){ST.aiHist=[...hist,{role:"assistant",content:"連線失敗 🙏 請確認 API URL 是否正確。"}];}
+  ST.aiLoad=false;render();
+  setTimeout(()=>{const c=document.getElementById("chatA");if(c)c.scrollTop=c.scrollHeight;},50);
+}
+function rAI(el){
+  const qs=["用日文說『謝謝』怎麼說？","別府地獄巡り要多久？","在日本搭車要注意什麼？","韓國超市必買清單"];
+  const msgs=ST.aiHist.map(m=>`<div class="bubble ${m.role==="user"?"u":"a"}">${m.content.replace(/\n/g,"<br>").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/&lt;br&gt;/g,"<br>")}</div>`).join("");
+  el.innerHTML=`<div class="chat-wrap"><div class="chat-area" id="chatA">${ST.aiHist.length===0?`<div style="text-align:center;padding:24px 16px;color:#546E7A"><div style="font-size:40px;margin-bottom:10px">🤖</div><div style="font-weight:600;font-size:16px;margin-bottom:8px">旅遊小幫手 TripBot</div><div style="font-size:13px;line-height:1.7">你好！我是你們的旅遊助理。<br>可以問我任何旅行相關問題！</div><div style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:12px">${qs.map(q=>`<button onclick="ST.aiIn='${q}';sendAI()" style="background:#EEF6FC;border:1px solid #D1EAF5;border-radius:20px;padding:7px 12px;font-size:12px;color:#0277BD;cursor:pointer;font-family:inherit">${q}</button>`).join("")}</div></div>`:""}${msgs}${ST.aiLoad?`<div class="typing"><span></span><span></span><span></span></div>`:""}</div><div style="flex-shrink:0;padding:10px 14px;border-top:1px solid #E1EEF6;background:#fff;display:flex;gap:8px;align-items:center"><input class="inp" style="flex:1;padding:11px 14px;border-radius:22px" value="${ST.aiIn.replace(/"/g,"&quot;")}" oninput="ST.aiIn=this.value" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI()}" placeholder="問問題…（Enter 送出）" id="aiInp"><button onclick="sendAI()" style="background:#0277BD;border:none;border-radius:50%;width:44px;height:44px;cursor:pointer;font-size:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff" ${ST.aiLoad?"disabled":""}>→</button></div></div>`;
+  setTimeout(()=>{if(!ST.aiLoad){const inp=document.getElementById("aiInp");if(inp)inp.value=ST.aiIn;}},50);
+}
+
+// ─── MORE ───
+function rMore(el){
+  const pg=ST.morePg;
+  if(pg==="pax")return rPax(el);
+  if(pg==="album")return rAlbum(el);
+  if(pg==="budget")return rBudget(el);
+  if(pg==="emergency")return rEmergency(el);
+  if(pg==="settings")return rSettings(el);
+  const pages=[{id:"pax",ic:"👥",l:"旅客清冊",d:"護照・聯絡資訊"},{id:"album",ic:"📸",l:"Google共用相簿",d:"全家共享照片"},{id:"budget",ic:"💰",l:"預算概覽",d:"費用彙整"},{id:"emergency",ic:"🆘",l:"緊急聯絡",d:"SOS電話"},{id:"settings",ic:"⚙️",l:"匯率設定",d:"JPY/KRW換算"}];
+  el.innerHTML=`<div class="section"><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:14px">⋯ 更多功能</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${pages.map(p=>`<div onclick="sn('morePg','${p.id}')" style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;padding:15px 13px;cursor:pointer;min-height:86px;display:flex;flex-direction:column;gap:7px"><span style="font-size:30px">${p.ic}</span><div><div style="font-size:14px;font-weight:600">${p.l}</div><div style="font-size:11px;color:#90A4AE;margin-top:2px">${p.d}</div></div></div>`).join("")}</div><div style="background:linear-gradient(135deg,#E1F5FE,#E0F7FA);border-radius:14px;padding:12px 14px;border:1px solid #D1EAF5"><div style="font-weight:600;font-size:13px;color:#0277BD;margin-bottom:4px">📱 eSIM 已購買 × 5 張</div><div style="font-size:12px;color:#546E7A;line-height:1.7">日本＋韓國 雙國無限流量・10天有效<br>出發前掃描 QR Code 安裝即可</div></div></div>`;
+}
+function backMore(){sn("morePg","menu");}
+function mH(t){return`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px 4px"><button onclick="backMore()" style="background:none;border:none;cursor:pointer;color:#0277BD;font-size:24px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center">←</button><div style="font-weight:600;font-size:16px">${t}</div></div>`;}
+
+function rPax(el){
+  const TC={adult:"#1565C0",child:"#2E7D32",infant:"#6A1B9A"},TL={adult:"成人",child:"兒童",infant:"幼兒"};
+  const items=ST.travelers.map(t=>{
+    const c=TC[t.kid]||"#0277BD",isE=ST.paxEdit===t.id;
+    return`<div class="card"><div class="card-top" style="background:${c}"></div><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;gap:7px"><div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><span style="font-size:26px;flex-shrink:0">${t.icon}</span><div style="min-width:0"><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap"><span style="font-weight:600;font-size:14px">${t.zh}</span><span class="pill" style="background:${c}18;color:${c}">${TL[t.kid]||"成人"}</span><span style="font-size:11px;color:#90A4AE">${t.role}</span></div><div style="font-size:12px;color:#546E7A;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.en?`<span style="font-family:monospace;color:#0277BD;font-weight:600">${t.en}</span>`:"<span style='color:#90A4AE;font-style:italic'>英文姓名未填</span>"}${t.passport?` 🛂${t.passport}`:""}</div>${t.phone||t.born?`<div style="font-size:11px;color:#90A4AE;margin-top:1px">${t.born?`📅${t.born} `:""}${t.phone?`📞${t.phone}`:""}</div>`:""}</div></div><button onclick="${isE?`sn('paxEdit',null)`:`ST.paxDraft={...ST.travelers.find(x=>x.id===${t.id})};sn('paxEdit',${t.id})`}" style="background:${isE?"#0277BD":"#F0F9FF"};color:${isE?"#fff":"#0277BD"};border:1px solid #D1EAF5;border-radius:20px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;min-height:36px;flex-shrink:0">${isE?"關閉":"✏️"}</button></div>${isE?`<div style="margin-top:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px">${[["英文姓名","en","CHANG CHIH-JUI"],["護照號碼","passport","A12345678"],["生日","born","1984-01-01"],["手機","phone","886-912-345678"],["性別","gender","F"],["國籍","nationality","ROC Taiwan"]].map(([l,k,ph])=>`<div><div style="font-size:11px;color:#546E7A;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">${l}</div><input class="inp" style="font-size:14px" value="${(ST.paxDraft[k]||"").replace(/"/g,"&quot;")}" oninput="ST.paxDraft['${k}']=this.value" placeholder="${ph}"></div>`).join("")}<div style="grid-column:1/-1"><button class="btn-p" onclick="savePax(${t.id})">儲存 ✓</button></div></div>`:""}</div></div>`;
+  }).join("");
+  el.innerHTML=mH("👥 旅客清冊")+`<div class="section" style="padding-top:8px"><div style="font-size:12px;color:#546E7A;margin-bottom:12px">護照資訊儲存在此裝置的本地儲存空間中。</div>${items}</div>`;
+}
+function savePax(id){
+  const travelers=ST.travelers.map(t=>t.id===id?{...t,...ST.paxDraft}:t);
+  set("travelers",travelers);sn("paxEdit",null);
+}
+
+function rAlbum(el){
+  const url=ST.albumUrl;
+  const qr=url?`https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=${encodeURIComponent(url)}`:"";
+  el.innerHTML=mH("📸 Google 共用相簿")+`<div class="section" style="padding-top:8px"><div style="font-size:13px;color:#546E7A;margin-bottom:14px;line-height:1.7">在 Google 相簿建立「共用相簿」後，貼入連結讓全家人都能看到和上傳照片。</div><div style="margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:#546E7A;margin-bottom:6px">相簿連結</div><input class="inp" id="albumInp" value="${(url||"").replace(/"/g,"&quot;")}" placeholder="https://photos.app.goo.gl/..."></div><div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn-p" onclick="const v=document.getElementById('albumInp').value;set('albumUrl',v)">儲存連結</button>${url?`<a href="${url}" target="_blank" class="btn-g" style="text-decoration:none;display:inline-flex;align-items:center">開啟相簿 ↗</a>`:""}</div>${url&&qr?`<div style="text-align:center"><div style="font-size:12px;color:#546E7A;margin-bottom:8px">📷 掃碼開啟（手機適用）</div><img src="${qr}" alt="QR" style="width:140px;height:140px;border-radius:10px;border:1px solid #E1EEF6"></div>`:"<div style='background:#F0F9FF;border-radius:12px;padding:20px;text-align:center;color:#90A4AE;font-size:13px'>尚未設定相簿連結</div>"}</div>`;
+}
+
+function getBudgetItems(){return ST.budgetItems&&ST.budgetItems.length?ST.budgetItems:DEF_BUDGET;}
+function toTWD2(total,cur){if(cur==="TWD")return Number(total);return Math.round(Number(total)*(cur==="KRW"?ST.rates.KRW:ST.rates.JPY));}
+function rBudget(el){
+  const items=getBudgetItems();
+  const fixedTotal=items.reduce((s,it)=>s+toTWD2(it.total,it.cur),0);
+  const expTotal=ST.exps.reduce((s,e)=>s+toTWD(e.amt,e.cur),0);
+  const grandTotal=fixedTotal+expTotal;
+  // Per-person breakdown
+  const ppl=["Claudia","Cony","Penny","張爸","張媽","多多","庭庭","膩膩","豆腐"];
+  const sharedExp=ST.exps.filter(e=>e.who==="共同").reduce((s,e)=>s+toTWD(e.amt,e.cur),0);
+  const perPplFromShared=Math.round(sharedExp/9);
+  const personalMap={};
+  ppl.forEach(p=>personalMap[p]=ST.exps.filter(e=>e.who===p).reduce((s,e)=>s+toTWD(e.amt,e.cur),0));
+  const editId=ST.budgetEditId,draft=ST.budgetDraft;
+  const rows=items.map((it,i)=>{
+    const isEd=editId===it.id;
+    const twd=toTWD2(it.total,it.cur);
+    if(isEd)return`<div style="padding:11px 14px;border-bottom:1px solid #E1EEF6;background:#F8FFFE">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
+        <input class="inp" style="font-size:14px" value="${(draft.cat||it.cat).replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.cat=this.value" placeholder="類別">
+        <input class="inp" style="font-size:14px" value="${(draft.label||it.label).replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.label=this.value" placeholder="說明">
+        <div><input class="inp" style="font-size:14px" type="text" inputmode="decimal" value="${draft.total!==undefined?draft.total:it.total}" oninput="ST.budgetDraft.total=this.value" placeholder="金額"></div>
+        <select class="inp" style="font-size:14px" onchange="ST.budgetDraft.cur=this.value"><option value="TWD" ${(draft.cur||it.cur)==="TWD"?"selected":""}>NT$ 台幣</option><option value="JPY" ${(draft.cur||it.cur)==="JPY"?"selected":""}>¥ 日圓</option><option value="KRW" ${(draft.cur||it.cur)==="KRW"?"selected":""}>₩ 韓圓</option></select>
+        <input class="inp" style="font-size:14px" value="${(draft.ref||it.ref||"").replace(/"/g,'&quot;')}" oninput="ST.budgetDraft.ref=this.value" placeholder="訂單號">
+        <button onclick="ST.budgetDraft.paid=!('paid' in ST.budgetDraft?ST.budgetDraft.paid:it.paid);render()" style="background:${'paid' in draft?(draft.paid?"#E1F5FE":"#FFF8E1"):(it.paid?"#E1F5FE":"#FFF8E1")};border:1.5px solid #D1EAF5;border-radius:10px;padding:10px;cursor:pointer;font-size:13px;font-family:inherit">${'paid' in draft?(draft.paid?"✅已付":"⏳待付"):(it.paid?"✅已付":"⏳待付")}</button>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button class="btn-p" style="flex:1;font-size:13px" onclick="saveBudgetEdit('${it.id}')">儲存 ✓</button>
+        <button class="btn-g" style="font-size:13px" onclick="sn('budgetEditId',null)">取消</button>
+      </div>
+    </div>`;
+    return`<div style="padding:11px 14px${i<items.length-1?";border-bottom:1px solid #E1EEF6":""}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;gap:5px;align-items:center;margin-bottom:2px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:600">${it.cat}</span>
+            <span class="tag" style="background:${it.paid?"#E1F5FE":"#FFF8E1"};color:${it.paid?"#01579B":"#E65100"}">${it.paid?"✅已付":"⏳待付"}</span>
+          </div>
+          <div style="font-size:13px">${it.label}</div>
+          ${it.ref?`<div style="font-size:11px;color:#0277BD;font-family:monospace">${it.ref}</div>`:""}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-weight:600;font-size:13px">${it.cur!=="TWD"?`${it.cur} ${nf(it.total)}→`:""} NT$ ${nf(twd)}</div>
+          <button onclick="ST.budgetEditId='${it.id}';ST.budgetDraft={};render()" style="background:none;border:none;cursor:pointer;color:#90A4AE;font-size:12px;margin-top:3px;font-family:inherit;min-height:28px">✏️ 編輯</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  
+  const ppRows=ppl.map(p=>{
+    const own=personalMap[p]||0;
+    const total=own+perPplFromShared;
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #E1EEF6">
+      <span style="font-size:13px">${p}</span>
+      <div style="text-align:right"><div style="font-size:13px;font-weight:600">NT$ ${nf(total)}</div><div style="font-size:11px;color:#90A4AE">個人 ${nf(own)} + 共同分攤 ${nf(perPplFromShared)}</div></div>
+    </div>`;
+  }).join("");
+  
+  el.innerHTML=mH("💰 預算概覽")+`<div class="section" style="padding-top:8px">
+    <!-- Summary Cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:#01579B;border-radius:14px;padding:12px 13px;color:#fff">
+        <div style="font-size:11px;opacity:.8;margin-bottom:3px">固定費用</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">NT$ ${nf(fixedTotal)}</div>
+      </div>
+      <div style="background:#00695C;border-radius:14px;padding:12px 13px;color:#fff">
+        <div style="font-size:11px;opacity:.8;margin-bottom:3px">已記帳費用</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600">NT$ ${nf(expTotal)}</div>
+        <div style="font-size:10px;opacity:.7;margin-top:2px">${ST.exps.length}筆</div>
+      </div>
+      <div style="background:#0277BD;border-radius:14px;padding:12px 13px;color:#fff;grid-column:1/-1">
+        <div style="font-size:11px;opacity:.8;margin-bottom:3px">預估總計（固定＋記帳）</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600">NT$ ${nf(grandTotal)}</div>
+        <div style="font-size:11px;opacity:.7;margin-top:2px">每人平均 NT$ ${nf(grandTotal/9)}</div>
+      </div>
+    </div>
+    <!-- Fixed Budget Items -->
+    <div style="font-weight:600;font-size:13px;color:#546E7A;margin-bottom:8px">固定預算（可編輯）</div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;overflow:hidden;margin-bottom:14px">${rows}</div>
+    <!-- Per-person breakdown -->
+    <div style="font-weight:600;font-size:13px;color:#546E7A;margin-bottom:8px">個人消費統計（含共同分攤 NT$ ${nf(perPplFromShared)}/人）</div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;padding:4px 14px;margin-bottom:14px">${ppRows||"<div style='padding:14px 0;text-align:center;color:#90A4AE;font-size:13px'>尚無記帳資料</div>"}</div>
+    <!-- Shared breakdown -->
+    <div style="background:#EEF6FC;border-radius:12px;padding:11px 14px;font-size:13px;color:#01579B">
+      共同支出：NT$ ${nf(sharedExp)}（${ST.exps.filter(e=>e.who==="共同").length}筆）→ 每人分攤 NT$ ${nf(perPplFromShared)}
+    </div>
+  </div>`;
+}
+function saveBudgetEdit(id){
+  const items=getBudgetItems().map(it=>{
+    if(it.id!==id)return it;
+    const d=ST.budgetDraft;
+    return{...it,
+      cat:d.cat||it.cat,label:d.label||it.label,
+      total:d.total!==undefined?Number(d.total):it.total,
+      cur:d.cur||it.cur,ref:d.ref!==undefined?d.ref:it.ref,
+      paid:"paid" in d?d.paid:it.paid
+    };
+  });
+  set("budgetItems",items);sn("budgetEditId",null);
+}
+
+function rEmergency(el){
+  const cts=[["🇰🇷 韓國急救","119"],["🇰🇷 韓國警察","112"],["🇯🇵 日本急救","119"],["🇯🇵 日本警察","110"],["🇹🇼 外交部緊急","+886-2-2343-2888"],["✈️ 中華航空","+886-2-2715-1212"],["🚢 新山茶花號","+82-51-999-3000"],["🏨 Encore 海雲台","+82-51-610-3000"],["♨ KAMENOI 黒川","0967-44-XXXX"],["🎨 Vessel 福岡","092-641-1234"],["📱 Claudia","886-919839970"]];
+  el.innerHTML=mH("🆘 緊急聯絡")+`<div class="section" style="padding-top:8px"><div style="background:#fff;border-radius:14px;border:1px solid #E1EEF6;overflow:hidden">${cts.map(([l,v],i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px${i<cts.length-1?";border-bottom:1px solid #E1EEF6":""}"><span style="font-size:13px">${l}</span><a href="tel:${v}" style="background:#01579B;color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap">${v}</a></div>`).join("")}</div></div>`;
+}
+
+function rSettings(el){
+  const r=ST.rates,apiUrl=ST.apiUrl||'';
+  el.innerHTML=mH('⚙️ 設定')+
+    '<div class="section" style="padding-top:8px">'+
+    '<div style="background:#EEF6FC;border-radius:12px;padding:12px 14px;margin-bottom:18px;border:1px solid #D1EAF5">'+
+      '<div style="font-weight:600;font-size:14px;color:#0277BD;margin-bottom:6px">🔗 Google Apps Script URL</div>'+
+      '<div style="font-size:12px;color:#546E7A;margin-bottom:8px;line-height:1.6">填入後：費用共用同步、AI 助手啟用。<br>不填則使用本裝置本地資料（每人分開）。</div>'+
+      '<input class="inp" id="apiUrlInp" value="'+apiUrl.replace(/"/g,'&quot;')+'" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:14px;margin-bottom:8px">'+
+      '<button class="btn-p" style="width:100%;font-size:14px;margin-bottom:6px" onclick="const v=document.getElementById(\'apiUrlInp\').value.trim();ST.apiUrl=v;ls(\'t26_api\',v);loadAll()">套用並同步 ✓</button>'+
+      (apiUrl
+        ? '<div style="font-size:11px;color:#2E7D32">✅ 已設定：'+apiUrl.substring(0,55)+'…</div>'
+        : '<div style="font-size:11px;color:#90A4AE">尚未設定（使用本地模式）</div>')+
+    '</div>'+
+    '<div style="font-weight:600;font-size:14px;color:#546E7A;margin-bottom:12px">💱 匯率設定</div>'+
+    '<div style="display:flex;flex-direction:column;gap:12px">'+
+      [['JPY','日圓','¥',r.JPY],['KRW','韓圓','₩',r.KRW]].map(([k,l,sy,v])=>
+        '<div>'+
+          '<div style="font-size:13px;font-weight:600;color:#546E7A;margin-bottom:6px">1 '+sy+'（'+l+'）＝ ? 台幣</div>'+
+          '<input class="inp" type="text" inputmode="decimal" id="rate_'+k+'" value="'+v+'" style="font-size:18px">'+
+          '<div style="font-size:11px;color:#90A4AE;margin-top:3px">目前：1 '+sy+' ≈ NT$ '+v+'</div>'+
+        '</div>'
+      ).join('')+
+      '<button class="btn-p" onclick="'+
+        'const j=parseFloat(document.getElementById(\'rate_JPY\').value)||ST.rates.JPY;'+
+        'const k2=parseFloat(document.getElementById(\'rate_KRW\').value)||ST.rates.KRW;'+
+        'set(\'rates\',{JPY:j,KRW:k2});'+
+        'alert(\'✅ 匯率已更新！日圓：\'+j+\' / 韓圓：\'+k2)'+
+      '">套用匯率 ✓</button>'+
+    '</div>'+
+  '</div>';
+}
+
+// ═══ INIT ═══
+updateCD();
+setInterval(updateCD,60000);
+const d1=new Date("2026-06-26"),diff2=Math.floor((new Date()-d1)/86400000)+1;
+ST.itinDay=Math.min(Math.max(diff2,1),10);
+ST.expForm.day=ST.itinDay;
+loadAll();
 </script>
 </body>
 </html>
